@@ -1,0 +1,1833 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Roland V-160HD Startup Companion Console</title>
+  <!-- Google Fonts: Poppins & Inter & JetBrains Mono -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Poppins:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Poppins', 'sans-serif'],
+            serif: ['Inter', 'sans-serif'],
+            mono: ['JetBrains Mono', 'monospace'],
+          }
+        }
+      }
+    }
+  </script>
+  <!-- Alpine.js -->
+  <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <style>
+    [x-cloak] { display: none !important; }
+    
+    /* Glossy Hardware Button Glow Effects */
+    .glow-pgm { 
+      box-shadow: 0 0 15px rgba(239, 68, 68, 0.45), inset 0 0 10px rgba(239, 68, 68, 0.2); 
+    } /* Live PGM Laser Red */
+    .glow-pst { 
+      box-shadow: 0 0 15px rgba(0, 240, 255, 0.45), inset 0 0 10px rgba(0, 240, 255, 0.2); 
+    } /* Preview PST Neon Cyan */
+    .glow-cyan { 
+      box-shadow: 0 0 15px rgba(0, 240, 255, 0.3), inset 0 0 8px rgba(0, 240, 255, 0.1); 
+    }
+    .glow-green { 
+      box-shadow: 0 0 15px rgba(16, 185, 129, 0.45), inset 0 0 10px rgba(16, 185, 129, 0.2); 
+    } /* Active Green */
+    .glow-orange {
+      box-shadow: 0 0 15px rgba(217, 119, 87, 0.35), inset 0 0 10px rgba(217, 119, 87, 0.15);
+    }
+    .glow-amber { 
+      box-shadow: 0 0 12px rgba(245, 158, 11, 0.35); 
+    }
+    
+    /* Custom Scrollbar */
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #080c14;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: rgba(148, 163, 184, 0.3);
+      border-radius: 3px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: rgba(148, 163, 184, 0.5);
+    }
+
+    /* Retro CRT Scanline Overlay for Jurassic Joke */
+    .crt-scanlines {
+      background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
+      background-size: 100% 4px, 6px 100%;
+    }
+  </style>
+</head>
+<body class="min-h-full font-serif flex flex-col antialiased selection:bg-[#00f0ff] selection:text-[#080c14] transition-colors duration-300" 
+      :class="activeTheme === 'cyber' ? 'bg-[#080c14] text-[#f8fafc]' : (activeTheme === 'amber' ? 'bg-[#141413] text-[#faf9f5]' : 'bg-[#04080f] text-[#f0fdf4]')" 
+      x-data="companionApp()">
+
+  <!-- HEADER -->
+  <header class="border-b bg-opacity-80 backdrop-blur-xl sticky top-0 z-40 px-6 py-4"
+          :class="activeTheme === 'cyber' ? 'border-slate-800/80 bg-[#080c14]/80' : (activeTheme === 'amber' ? 'border-[#e8e6dc]/10 bg-[#141413]/80' : 'border-emerald-950/80 bg-[#04080f]/80')">
+    <div class="max-w-7xl mx-auto flex flex-col lg:flex-row justify-between items-center gap-4">
+      <!-- Title & Beacon -->
+      <div class="flex items-center gap-3">
+        <div class="relative flex h-3 w-3">
+          <span class="animate-ping absolute inline-flex h-full w-full rounded-full opacity-75" :class="activeConnection ? 'bg-[#10b981]' : 'bg-[#ff3366]'"></span>
+          <span class="relative inline-flex rounded-full h-3 w-3" :class="activeConnection ? 'bg-[#10b981]' : 'bg-[#ff3366]'"></span>
+        </div>
+        <div>
+          <h1 class="text-xl font-extrabold tracking-wider flex items-center gap-2 font-sans" :class="activeTheme === 'amber' ? 'text-[#faf9f5]' : 'text-white'">
+            ROLAND V-160HD <span class="text-[10px] px-2 py-0.5 rounded font-mono font-bold tracking-normal border" 
+                                 :class="activeTheme === 'cyber' ? 'bg-[#00f0ff]/10 text-[#00f0ff] border-[#00f0ff]/20 glow-cyan' : (activeTheme === 'amber' ? 'bg-[#d97757]/10 text-[#d97757] border-[#d97757]/20 glow-orange' : 'bg-[#10b981]/10 text-[#10b981] border-[#10b981]/20 glow-green')">CONSOLE v2.5</span>
+          </h1>
+          <p class="text-xs font-sans" :class="activeTheme === 'cyber' ? 'text-[#94a3b8]' : (activeTheme === 'amber' ? 'text-[#b0aea5]' : 'text-emerald-500/70')">High-Tech Setup Guide & Reference Console</p>
+        </div>
+      </div>
+
+      <!-- Theme Switcher, Mode Toggle & Navigation Tabs -->
+      <div class="flex flex-wrap items-center justify-center gap-4">
+        <!-- THEME SWITCHER -->
+        <div class="flex items-center gap-1.5 p-1 rounded-lg border font-sans shadow-inner"
+             :class="activeTheme === 'cyber' ? 'bg-slate-950 border-slate-800' : (activeTheme === 'amber' ? 'bg-[#141413] border-[#e8e6dc]/10' : 'bg-slate-950 border-emerald-950')">
+          <button @click="activeTheme = 'cyber'; saveState()" :class="activeTheme === 'cyber' ? 'bg-[#00f0ff]/15 text-[#00f0ff] border border-[#00f0ff]/20 glow-cyan' : 'text-slate-500 hover:text-slate-300'" class="p-1 px-2.5 text-[9px] font-bold rounded transition cursor-pointer">CYBER</button>
+          <button @click="activeTheme = 'amber'; saveState()" :class="activeTheme === 'amber' ? 'bg-[#d97757]/15 text-[#d97757] border border-[#d97757]/20 glow-orange' : 'text-slate-500 hover:text-slate-300'" class="p-1 px-2.5 text-[9px] font-bold rounded transition cursor-pointer">AMBER</button>
+          <button @click="activeTheme = 'green'; saveState()" :class="activeTheme === 'green' ? 'bg-[#10b981]/15 text-[#10b981] border border-[#10b981]/20 glow-green' : 'text-slate-500 hover:text-slate-300'" class="p-1 px-2.5 text-[9px] font-bold rounded transition cursor-pointer">MATRIX</button>
+        </div>
+
+        <!-- Mode Toggle (Simple Wizard vs Expert Mode) -->
+        <div class="flex items-center gap-2 px-3 py-1.5 rounded-lg border font-sans shadow-inner"
+             :class="activeTheme === 'cyber' ? 'bg-slate-900/60 border-slate-800' : (activeTheme === 'amber' ? 'bg-[#faf9f5]/5 border-[#e8e6dc]/10' : 'bg-slate-900/40 border-slate-800')">
+          <span class="text-xs font-bold transition" :class="!expertMode ? (activeTheme === 'cyber' ? 'text-[#00f0ff] glow-cyan' : (activeTheme === 'amber' ? 'text-[#d97757] glow-orange' : 'text-[#10b981] glow-green')) : 'text-[#94a3b8]'">Simple Guide</span>
+          <label class="relative inline-flex items-center cursor-pointer">
+            <input type="checkbox" x-model="expertMode" @change="saveState()" class="sr-only peer">
+            <div class="w-9 h-5 rounded-full peer peer-checked:after:translate-x-full after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:rounded-full after:h-4 after:w-4 after:transition-all"
+                 :class="activeTheme === 'cyber' ? 'bg-slate-950 border border-slate-800 after:bg-[#94a3b8] peer-checked:bg-[#00f0ff] peer-checked:after:bg-[#080c14]' : (activeTheme === 'amber' ? 'bg-[#141413] border border-[#e8e6dc]/25 after:bg-[#b0aea5] peer-checked:bg-[#d97757] peer-checked:after:bg-[#141413]' : 'bg-slate-950 border border-slate-850 after:bg-[#94a3b8] peer-checked:bg-[#10b981] peer-checked:after:bg-[#04080f]')"></div>
+          </label>
+          <span class="text-xs font-bold transition" :class="expertMode ? (activeTheme === 'cyber' ? 'text-[#00f0ff] glow-cyan' : (activeTheme === 'amber' ? 'text-[#d97757] glow-orange' : 'text-[#10b981] glow-green')) : 'text-[#94a3b8]'">Expert Mode</span>
+        </div>
+
+        <!-- Navigation Tabs (Only visible in Expert Mode) -->
+        <nav x-show="expertMode" class="flex flex-wrap p-1 rounded-lg border font-sans" 
+             :class="activeTheme === 'cyber' ? 'bg-slate-900/60 border-slate-800' : (activeTheme === 'amber' ? 'bg-[#faf9f5]/5 border-[#e8e6dc]/10' : 'bg-slate-900/40 border-slate-800')" x-cloak>
+          <button @click="activeTab = 'patchbay'" :class="activeTab === 'patchbay' ? (activeTheme === 'cyber' ? 'bg-[#00f0ff]/10 text-[#00f0ff] border border-[#00f0ff]/20 glow-cyan' : (activeTheme === 'amber' ? 'bg-[#d97757]/10 text-[#d97757] border border-[#d97757]/20 glow-orange' : 'bg-[#10b981]/10 text-[#10b981] border border-[#10b981]/20 glow-green')) : 'text-[#94a3b8] hover:text-[#f8fafc]'" class="px-4 py-1.5 rounded-md text-xs font-semibold tracking-wide transition flex items-center gap-1.5 font-bold">
+            <i data-lucide="cable" class="w-3.5 h-3.5"></i> Patch Bay
+          </button>
+          <button @click="activeTab = 'checklist'" :class="activeTab === 'checklist' ? (activeTheme === 'cyber' ? 'bg-[#00f0ff]/10 text-[#00f0ff] border border-[#00f0ff]/20 glow-cyan' : (activeTheme === 'amber' ? 'bg-[#d97757]/10 text-[#d97757] border border-[#d97757]/20 glow-orange' : 'bg-[#10b981]/10 text-[#10b981] border border-[#10b981]/20 glow-green')) : 'text-[#94a3b8] hover:text-[#f8fafc]'" class="px-4 py-1.5 rounded-md text-xs font-semibold tracking-wide transition flex items-center gap-1.5 font-bold">
+            <i data-lucide="check-square" class="w-3.5 h-3.5"></i> Startup Checklist
+          </button>
+          <button @click="activeTab = 'audio'" :class="activeTab === 'audio' ? (activeTheme === 'cyber' ? 'bg-[#00f0ff]/10 text-[#00f0ff] border border-[#00f0ff]/20 glow-cyan' : (activeTheme === 'amber' ? 'bg-[#d97757]/10 text-[#d97757] border border-[#d97757]/20 glow-orange' : 'bg-[#10b981]/10 text-[#10b981] border border-[#10b981]/20 glow-green')) : 'text-[#94a3b8] hover:text-[#f8fafc]'" class="px-4 py-1.5 rounded-md text-xs font-semibold tracking-wide transition flex items-center gap-1.5 font-bold">
+            <i data-lucide="sliders" class="w-3.5 h-3.5"></i> Audio Mixer
+          </button>
+          <button @click="activeTab = 'tally'" :class="activeTab === 'tally' ? (activeTheme === 'cyber' ? 'bg-[#00f0ff]/10 text-[#00f0ff] border border-[#00f0ff]/20 glow-cyan' : (activeTheme === 'amber' ? 'bg-[#d97757]/10 text-[#d97757] border border-[#d97757]/20 glow-orange' : 'bg-[#10b981]/10 text-[#10b981] border border-[#10b981]/20 glow-green')) : 'text-[#94a3b8] hover:text-[#f8fafc]'" class="px-4 py-1.5 rounded-md text-xs font-semibold tracking-wide transition flex items-center gap-1.5 font-bold">
+            <i data-lucide="radio" class="w-3.5 h-3.5"></i> Tally Simulator
+          </button>
+          <button @click="activeTab = 'troubleshooting'" :class="activeTab === 'troubleshooting' ? (activeTheme === 'cyber' ? 'bg-[#00f0ff]/10 text-[#00f0ff] border border-[#00f0ff]/20 glow-cyan' : (activeTheme === 'amber' ? 'bg-[#d97757]/10 text-[#d97757] border border-[#d97757]/20 glow-orange' : 'bg-[#10b981]/10 text-[#10b981] border-[#10b981]/20 glow-green')) : 'text-[#94a3b8] hover:text-[#f8fafc]'" class="px-4 py-1.5 rounded-md text-xs font-semibold tracking-wide transition flex items-center gap-1.5 font-bold">
+            <i data-lucide="help-circle" class="w-3.5 h-3.5"></i> Diagnostics
+          </button>
+        </nav>
+      </div>
+
+      <!-- Overall Tracker -->
+      <div class="flex items-center gap-3 px-3 py-1.5 rounded-lg border font-sans shadow-inner"
+           :class="activeTheme === 'cyber' ? 'bg-slate-900 border-slate-800' : (activeTheme === 'amber' ? 'bg-[#faf9f5]/5 border-[#e8e6dc]/10' : 'bg-slate-900/40 border-slate-800')">
+        <span class="text-xs font-mono" :class="activeTheme === 'cyber' ? 'text-[#94a3b8]' : (activeTheme === 'amber' ? 'text-[#b0aea5]' : 'text-emerald-500/70')">PROGRESS:</span>
+        <div class="w-24 bg-slate-950 rounded-full h-2 overflow-hidden border border-slate-850">
+          <div class="h-2 transition-all duration-300" 
+               :class="activeTheme === 'cyber' ? 'bg-[#00f0ff] glow-cyan' : (activeTheme === 'amber' ? 'bg-[#d97757] glow-orange' : 'bg-[#10b981] glow-green')" 
+               :style="`width: ${progressPercent}%`"></div>
+        </div>
+        <span class="text-xs font-mono font-bold" 
+              :class="activeTheme === 'cyber' ? 'text-[#00f0ff]' : (activeTheme === 'amber' ? 'text-[#d97757]' : 'text-[#10b981]')" 
+              x-text="`${progressPercent}%`"></span>
+      </div>
+    </div>
+  </header>
+
+  <!-- MAIN WORKSPACE -->
+  <main class="flex-1 max-w-7xl w-full mx-auto px-6 py-8 space-y-6">
+
+    <!-- ========================================== -->
+    <!-- SIMPLE MODE: GUIDED SETUP WIZARD (DEFAULT) -->
+    <!-- ========================================== -->
+    <div x-show="!expertMode" class="max-w-3xl mx-auto space-y-6" x-transition:enter="transition ease-out duration-200">
+      
+      <!-- Wizard Progress Indicators -->
+      <div class="border rounded-2xl p-4 flex justify-between items-center font-sans shadow-lg"
+           :class="activeTheme === 'cyber' ? 'bg-slate-900/60 border-slate-800' : (activeTheme === 'amber' ? 'bg-[#faf9f5]/5 border-[#e8e6dc]/10' : 'bg-slate-900/40 border-slate-855')">
+        <div class="flex gap-2">
+          <template x-for="n in 5" :key="'step-dot-'+n">
+            <div class="w-8 h-2 rounded-full transition-colors duration-300" 
+                 :class="n === wizardStep ? (activeTheme === 'cyber' ? 'bg-[#00f0ff] glow-cyan' : (activeTheme === 'amber' ? 'bg-[#d97757] glow-orange' : 'bg-[#10b981] glow-green')) : (n < wizardStep ? 'bg-[#10b981] glow-green' : 'bg-slate-800')"></div>
+          </template>
+        </div>
+        <span class="text-xs font-bold" :class="activeTheme === 'cyber' ? 'text-[#94a3b8]' : (activeTheme === 'amber' ? 'text-[#b0aea5]' : 'text-emerald-500/70')" x-text="`Step ${wizardStep} of 5: ${getWizardStepName()}`"></span>
+      </div>
+
+      <!-- Main Step Container Card (Glossy Glassmorphic Panel) -->
+      <div class="backdrop-blur-xl rounded-2xl p-6 shadow-2xl space-y-6 min-h-[420px] flex flex-col justify-between"
+           :class="activeTheme === 'cyber' ? 'bg-slate-900/50 border border-slate-800/80 shadow-[0_0_30px_rgba(0,240,255,0.02)]' : (activeTheme === 'amber' ? 'bg-[#faf9f5]/5 border border-[#e8e6dc]/10' : 'bg-slate-900/30 border border-slate-850/80')">
+        
+        <!-- STEP 1: Power & Reset -->
+        <div x-show="wizardStep === 1" class="space-y-4" x-transition>
+          <div class="space-y-2">
+            <h2 class="text-lg font-black font-sans flex items-center gap-2" :class="activeTheme === 'amber' ? 'text-[#faf9f5]' : 'text-white'">
+              <i data-lucide="power" class="animate-pulse" :class="activeTheme === 'cyber' ? 'text-[#00f0ff]' : (activeTheme === 'amber' ? 'text-[#d97757]' : 'text-[#10b981]')"></i> 1. Clear Settings & Reset Switcher
+            </h2>
+            <p class="text-sm font-serif leading-relaxed" :class="activeTheme === 'cyber' ? 'text-[#94a3b8]' : (activeTheme === 'amber' ? 'text-[#b0aea5]' : 'text-slate-400')">
+              Before plugging in any laptops, let's wipe all leftover setups so we start fresh. Turn on the Roland V-160HD hardware switcher, press the menu knob, and execute a Factory Reset.
+            </p>
+          </div>
+          
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2">
+            <div class="p-4 rounded-xl space-y-3 font-sans shadow-inner"
+                 :class="activeTheme === 'cyber' ? 'bg-slate-950/80 border border-slate-800' : (activeTheme === 'amber' ? 'bg-[#141413] border border-[#e8e6dc]/15' : 'bg-slate-950 border border-slate-850')">
+              <span class="text-xs font-mono font-bold block" :class="activeTheme === 'cyber' ? 'text-[#00f0ff]' : (activeTheme === 'amber' ? 'text-[#d97757]' : 'text-[#10b981]')">FOLLOW THIS MENU PATH:</span>
+              <p class="text-sm font-bold bg-opacity-60 p-3 rounded border text-center font-mono"
+                 :class="activeTheme === 'cyber' ? 'bg-slate-900 border-slate-850 text-white' : (activeTheme === 'amber' ? 'bg-[#faf9f5]/5 border-[#e8e6dc]/10 text-[#faf9f5]' : 'bg-slate-900 border-slate-800 text-white')">
+                [MENU] &rarr; SYSTEM &rarr; FACTORY RESET &rarr; YES
+              </p>
+              <div class="flex justify-center pt-2">
+                <button @click="toggleStepComplete(0, 0)" 
+                        class="px-4 py-2 text-xs font-bold rounded-lg border transition duration-200 cursor-pointer shadow-md"
+                        :class="phases[0].steps[0].completed ? 'bg-[#10b981]/20 border-[#10b981] text-[#10b981] glow-green' : (activeTheme === 'cyber' ? 'bg-slate-900 border-slate-800 text-[#ffffff] hover:border-[#00f0ff]' : (activeTheme === 'amber' ? 'bg-[#141413] border-[#e8e6dc]/20 text-[#faf9f5] hover:border-[#d97757]' : 'bg-slate-900 border-slate-850 text-[#ffffff] hover:border-[#10b981]'))">
+                  <span x-text="phases[0].steps[0].completed ? '✓ Completed' : 'Mark Reset Done'"></span>
+                </button>
+              </div>
+            </div>
+            <div class="space-y-1">
+              <span class="text-[10px] font-bold block uppercase font-sans" :class="activeTheme === 'cyber' ? 'text-[#94a3b8]' : (activeTheme === 'amber' ? 'text-[#b0aea5]' : 'text-slate-500')">SCREEN GUIDE REFERENCE:</span>
+              <img src="./1623725145_IMG_1550674.jpg" class="w-full max-h-48 object-contain rounded-lg border" 
+                   :class="activeTheme === 'cyber' ? 'border-slate-800' : (activeTheme === 'amber' ? 'border-[#e8e6dc]/10' : 'border-slate-850')" />
+            </div>
+          </div>
+        </div>
+
+        <!-- STEP 2: Connect Your Laptop to Input 1 -->
+        <div x-show="wizardStep === 2" class="space-y-4" x-transition>
+          <div class="space-y-2">
+            <h2 class="text-lg font-black font-sans flex items-center gap-2" :class="activeTheme === 'amber' ? 'text-[#faf9f5]' : 'text-white'">
+              <i data-lucide="laptop" :class="activeTheme === 'cyber' ? 'text-[#00f0ff]' : (activeTheme === 'amber' ? 'text-[#d97757]' : 'text-[#10b981]')"></i> 2. Connect Presentation Laptop to Input 1
+            </h2>
+            <p class="text-sm font-serif leading-relaxed" :class="activeTheme === 'cyber' ? 'text-[#94a3b8]' : (activeTheme === 'amber' ? 'text-[#b0aea5]' : 'text-slate-400')">
+              Locate the HDMI cable coming from your presentation laptop. Connect it directly to physical port **HDMI INPUT 1** on the back of the switcher.
+            </p>
+          </div>
+
+          <div class="p-4 rounded-xl space-y-4 font-sans shadow-inner"
+               :class="activeTheme === 'cyber' ? 'bg-slate-950 border border-slate-800' : (activeTheme === 'amber' ? 'bg-[#141413] border border-[#e8e6dc]/10' : 'bg-slate-950 border border-slate-850')">
+            <div class="flex justify-between items-center">
+              <div>
+                <span class="text-xs font-bold" :class="activeTheme === 'amber' ? 'text-[#faf9f5]' : 'text-white'">Physical Port: HDMI Input 1</span>
+                <span class="text-[10px] block" :class="activeTheme === 'cyber' ? 'text-[#94a3b8]' : (activeTheme === 'amber' ? 'text-[#b0aea5]' : 'text-slate-500')">Destination Label: <span class="font-bold" :class="activeTheme === 'cyber' ? 'text-[#00f0ff]' : (activeTheme === 'amber' ? 'text-[#d97757]' : 'text-[#10b981]')" x-text="inputs[0].label"></span></span>
+              </div>
+              <button @click="inputs[0].connected = !inputs[0].connected; saveState()" 
+                      class="px-4 py-2 text-xs font-bold rounded-lg border transition cursor-pointer shadow-md"
+                      :class="inputs[0].connected ? 'bg-[#10b981]/20 border-[#10b981] text-[#10b981] glow-green' : (activeTheme === 'cyber' ? 'bg-slate-900 border-slate-800 text-slate-400 hover:text-white' : (activeTheme === 'amber' ? 'bg-slate-900 border-[#e8e6dc]/15 text-[#b0aea5] hover:text-[#faf9f5]' : 'bg-slate-900 border-slate-855 text-slate-400 hover:text-white'))">
+                <span x-text="inputs[0].connected ? '● Signal Connected' : '○ Simulate Plug In'"></span>
+              </button>
+            </div>
+            
+            <div x-show="inputs[0].connected" class="text-xs bg-[#10b981]/10 border border-[#10b981]/20 text-[#10b981] p-3 rounded-lg flex items-center gap-2 animate-pulse glow-green">
+              <i data-lucide="check-circle" class="w-4 h-4"></i>
+              <span>Signal Detected! Switcher has locked onto Laptop EDID format (1080p).</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- STEP 3: Route Image to Projectors -->
+        <div x-show="wizardStep === 3" class="space-y-4" x-transition>
+          <div class="space-y-2">
+            <h2 class="text-lg font-black font-sans flex items-center gap-2" :class="activeTheme === 'amber' ? 'text-[#faf9f5]' : 'text-white'">
+              <i data-lucide="tv" :class="activeTheme === 'cyber' ? 'text-[#00f0ff]' : (activeTheme === 'amber' ? 'text-[#d97757]' : 'text-[#10b981]')"></i> 3. Route Laptop Screen to Projectors
+            </h2>
+            <p class="text-sm font-serif leading-relaxed" :class="activeTheme === 'cyber' ? 'text-[#94a3b8]' : (activeTheme === 'amber' ? 'text-[#b0aea5]' : 'text-slate-400')">
+              Route your presentation laptop to the screens. Click the PGM/PST buttons on the left switcher panel to watch the multi-view screens respond.
+            </p>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6 font-sans">
+            <!-- Simulated Switcher rows (PGM on top, PST on bottom) -->
+            <div class="p-4 rounded-xl space-y-4 shadow-inner"
+                 :class="activeTheme === 'cyber' ? 'bg-slate-950 border border-slate-800' : (activeTheme === 'amber' ? 'bg-[#141413] border border-[#e8e6dc]/10' : 'bg-slate-950 border border-slate-850')">
+              <!-- Program Row (Top, Red when selected) -->
+              <div class="space-y-1.5">
+                <span class="text-[9px] font-bold text-[#ff3366] block font-mono tracking-wider">PROGRAM BUS (PGM - TOP ROW)</span>
+                <div class="flex gap-2">
+                  <template x-for="n in 4" :key="'wiz-pgm-'+n">
+                    <button @click="selectPGM(n)"
+                            class="flex-1 py-2 rounded-lg border font-mono font-bold text-xs transition cursor-pointer shadow-[inset_0_1px_0_rgba(255,255,255,0.05)]"
+                            :class="pgmCrossPoint === n ? 'bg-red-500/20 border-red-500 text-red-400 glow-pgm font-black' : (activeTheme === 'amber' ? 'bg-slate-900 border-[#e8e6dc]/15 text-[#b0aea5] hover:bg-slate-800 hover:text-[#faf9f5]' : 'bg-slate-900 border-slate-800 text-[#94a3b8] hover:bg-slate-850 hover:text-[#f8fafc]')">
+                      <span x-text="`PGM ${n}`"></span>
+                    </button>
+                  </template>
+                </div>
+              </div>
+
+              <!-- Preset Row (Bottom, Green/Cyan/Orange when selected) -->
+              <div class="space-y-1.5">
+                <span class="text-[9px] font-bold block font-mono tracking-wider" :class="activeTheme === 'cyber' ? 'text-[#00f0ff]' : (activeTheme === 'amber' ? 'text-[#d97757]' : 'text-[#10b981]')">PREVIEW BUS (PST - BOTTOM ROW)</span>
+                <div class="flex gap-2">
+                  <template x-for="n in 4" :key="'wiz-pst-'+n">
+                    <button @click="selectPST(n)"
+                            class="flex-1 py-2 rounded-lg border font-mono font-bold text-xs transition cursor-pointer shadow-[inset_0_1px_0_rgba(255,255,255,0.05)]"
+                            :class="pstCrossPoint === n ? (activeTheme === 'cyber' ? 'bg-[#00f0ff]/20 border-[#00f0ff] text-[#00f0ff] glow-pst font-black' : (activeTheme === 'amber' ? 'bg-[#d97757]/20 border-[#d97757] text-[#d97757] glow-orange font-black' : 'bg-[#10b981]/20 border-[#10b981] text-[#10b981] glow-green font-black')) : (activeTheme === 'amber' ? 'bg-slate-900 border-[#e8e6dc]/15 text-[#b0aea5] hover:bg-slate-800 hover:text-[#faf9f5]' : 'bg-slate-900 border-slate-800 text-[#94a3b8] hover:bg-slate-850 hover:text-[#f8fafc]')">
+                      <span x-text="`PST ${n}`"></span>
+                    </button>
+                  </template>
+                </div>
+              </div>
+            </div>
+
+            <!-- Multi-view simulator (Preview left, Program right) -->
+            <div class="p-4 rounded-xl space-y-2 shadow-inner"
+                 :class="activeTheme === 'cyber' ? 'bg-slate-950 border border-slate-800' : (activeTheme === 'amber' ? 'bg-[#141413] border border-[#e8e6dc]/10' : 'bg-slate-950 border border-slate-850')">
+              <span class="text-[9px] font-bold block font-mono text-center tracking-wider" :class="activeTheme === 'cyber' ? 'text-[#94a3b8]' : (activeTheme === 'amber' ? 'text-[#b0aea5]' : 'text-slate-500')">ROLAND V-160HD MULTI-VIEW OUT</span>
+              
+              <div class="grid grid-cols-2 gap-2 w-full mt-1">
+                <!-- PREVIEW Screen (PST - Left) -->
+                <div class="aspect-video border-2 rounded flex flex-col items-center justify-center p-2 relative bg-black/80 transition duration-300"
+                     :class="pstCrossPoint === 1 ? (activeTheme === 'cyber' ? 'border-[#00f0ff] text-[#00f0ff] glow-pst' : (activeTheme === 'amber' ? 'border-[#d97757] text-[#d97757] glow-orange' : 'border-[#10b981] text-[#10b981] glow-green')) : 'border-slate-800 text-slate-700'">
+                  <span class="absolute top-1 left-1 text-[8px] font-bold font-sans bg-[#080c14] px-1.5 py-0.5 rounded border border-slate-800">PREVIEW (PST)</span>
+                  <i :data-lucide="pstCrossPoint === 1 ? 'presentation' : 'tv-off'" class="w-6 h-6"></i>
+                  <span class="text-[9px] font-bold mt-1 text-center font-sans" x-text="pstCrossPoint === 1 ? 'Laptop Presentation' : 'Empty Input Feed'"></span>
+                </div>
+
+                <!-- PROGRAM Screen (PGM - Right) -->
+                <div class="aspect-video border-2 rounded flex flex-col items-center justify-center p-2 relative bg-black/80 transition duration-300"
+                     :class="pgmCrossPoint === 1 ? 'border-red-500 text-[#f8fafc] glow-pgm' : 'border-slate-800 text-slate-700'">
+                  <span class="absolute top-1 left-1 text-[8px] font-bold font-sans bg-[#080c14] px-1.5 py-0.5 rounded border border-slate-800 text-red-500" :class="pgmCrossPoint === 1 ? 'animate-pulse' : ''">PROGRAM (PGM)</span>
+                  <i :data-lucide="pgmCrossPoint === 1 ? 'presentation' : 'tv-off'" class="w-6 h-6" :class="pgmCrossPoint === 1 ? 'text-red-500' : ''"></i>
+                  <span class="text-[9px] font-bold mt-1 text-center font-sans" x-text="pgmCrossPoint === 1 ? 'Laptop Presentation' : 'Black Output Screen'"></span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- STEP 4: Laptop Audio Routing -->
+        <div x-show="wizardStep === 4" class="space-y-4" x-transition>
+          <div class="space-y-2">
+            <h2 class="text-lg font-black font-sans flex items-center gap-2" :class="activeTheme === 'amber' ? 'text-[#faf9f5]' : 'text-white'">
+              <i data-lucide="volume-2" :class="activeTheme === 'cyber' ? 'text-[#00f0ff]' : (activeTheme === 'amber' ? 'text-[#d97757]' : 'text-[#10b981]')"></i> 4. Select Laptop Audio Output Device
+            </h2>
+            <p class="text-sm font-serif leading-relaxed" :class="activeTheme === 'cyber' ? 'text-[#94a3b8]' : (activeTheme === 'amber' ? 'text-[#b0aea5]' : 'text-slate-400')">
+              To send sound from your laptop through the room speakers, configure your computer's audio settings. Select your setup choice below:
+            </p>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 font-sans">
+            <!-- Option A: Digital HDMI -->
+            <button @click="audioOption = 'hdmi'; saveState()" 
+                 class="p-5 rounded-xl space-y-3 flex flex-col justify-between shadow-inner text-left border transition-all duration-300 cursor-pointer w-full"
+                 :class="audioOption === 'hdmi' ? (activeTheme === 'cyber' ? 'bg-[#00f0ff]/10 border-[#00f0ff] text-white glow-cyan' : (activeTheme === 'amber' ? 'bg-[#d97757]/10 border-[#d97757] text-[#faf9f5] glow-orange' : 'bg-[#10b981]/10 border-[#10b981] text-white glow-green')) : (activeTheme === 'amber' ? 'bg-slate-900 border-[#e8e6dc]/15 text-[#b0aea5] hover:border-slate-700' : 'bg-slate-950 border-slate-800 text-[#94a3b8] hover:border-slate-700')">
+              <div class="space-y-2 w-full">
+                <div class="flex items-center justify-between">
+                  <span class="text-xs font-bold px-2 py-0.5 rounded border" 
+                        :class="activeTheme === 'cyber' ? 'bg-[#00f0ff]/10 border-[#00f0ff]/20 text-[#00f0ff]' : (activeTheme === 'amber' ? 'bg-[#d97757]/10 border-[#d97757]/20 text-[#d97757]' : 'bg-[#10b981]/10 border-[#10b981]/20 text-[#10b981]')">OPTION A: DIGITAL HDMI</span>
+                  <span x-show="audioOption === 'hdmi'" class="text-xs font-bold flex items-center gap-1" :class="activeTheme === 'cyber' ? 'text-[#00f0ff]' : (activeTheme === 'amber' ? 'text-[#d97757]' : 'text-[#10b981]')">
+                    <i data-lucide="check-circle" class="w-4 h-4"></i> Selected
+                  </span>
+                </div>
+                <h3 class="text-sm font-bold" :class="activeTheme === 'amber' ? 'text-[#faf9f5]' : 'text-white'">Send audio over the HDMI cable</h3>
+                <p class="text-xs leading-relaxed" :class="activeTheme === 'cyber' ? 'text-[#94a3b8]' : (activeTheme === 'amber' ? 'text-[#b0aea5]' : 'text-slate-400')">
+                  Open your laptop's speaker settings on your computer taskbar and select:
+                </p>
+                <div class="p-2 rounded text-center font-mono text-xs font-bold border bg-slate-900"
+                     :class="activeTheme === 'cyber' ? 'border-[#00f0ff]/20 text-[#00f0ff]' : (activeTheme === 'amber' ? 'border-[#d97757]/20 text-[#d97757]' : 'border-[#10b981]/20 text-[#10b981]')">
+                  Roland V-160HD (HDMI)
+                </div>
+              </div>
+              <span class="text-[9px] italic block mt-2" :class="activeTheme === 'cyber' ? 'text-[#94a3b8]' : (activeTheme === 'amber' ? 'text-[#b0aea5]' : 'text-slate-500')">No extra audio cables required.</span>
+            </button>
+
+            <!-- Option B: Analog DI Box -->
+            <button @click="audioOption = 'di'; saveState()" 
+                 class="p-5 rounded-xl space-y-3 flex flex-col justify-between shadow-inner text-left border transition-all duration-300 cursor-pointer w-full"
+                 :class="audioOption === 'di' ? (activeTheme === 'cyber' ? 'bg-[#00f0ff]/10 border-[#00f0ff] text-white glow-cyan' : (activeTheme === 'amber' ? 'bg-[#d97757]/10 border-[#d97757] text-[#faf9f5] glow-orange' : 'bg-[#10b981]/10 border-[#10b981] text-white glow-green')) : (activeTheme === 'amber' ? 'bg-slate-900 border-[#e8e6dc]/15 text-[#b0aea5] hover:border-slate-700' : 'bg-slate-950 border-slate-800 text-[#94a3b8] hover:border-slate-700')">
+              <div class="space-y-2 w-full">
+                <div class="flex items-center justify-between">
+                  <span class="text-xs font-bold px-2 py-0.5 rounded border" 
+                        :class="activeTheme === 'cyber' ? 'bg-[#10b981]/10 border-[#10b981]/20 text-[#10b981]' : (activeTheme === 'amber' ? 'bg-[#10b981]/10 border-[#10b981]/20 text-[#10b981]' : 'bg-[#10b981]/10 border-[#10b981]/20 text-[#10b981]')">OPTION B: ANALOG DI BOX</span>
+                  <span x-show="audioOption === 'di'" class="text-xs font-bold flex items-center gap-1" :class="activeTheme === 'cyber' ? 'text-[#00f0ff]' : (activeTheme === 'amber' ? 'text-[#d97757]' : 'text-[#10b981]')">
+                    <i data-lucide="check-circle" class="w-4 h-4"></i> Selected
+                  </span>
+                </div>
+                <h3 class="text-sm font-bold" :class="activeTheme === 'amber' ? 'text-[#faf9f5]' : 'text-white'">Send audio over the headphone jack</h3>
+                <p class="text-xs leading-relaxed" :class="activeTheme === 'cyber' ? 'text-[#94a3b8]' : (activeTheme === 'amber' ? 'text-[#b0aea5]' : 'text-slate-400')">
+                  Connect the 3.5mm jack coming from your DI box into your laptop's headphone port. Select:
+                </p>
+                <div class="p-2 rounded text-center font-mono text-xs font-bold border bg-slate-900"
+                     :class="activeTheme === 'cyber' ? 'border-[#00f0ff]/20 text-[#00f0ff]' : (activeTheme === 'amber' ? 'border-[#d97757]/20 text-[#d97757]' : 'border-[#10b981]/20 text-[#10b981]')">
+                  Headphones / Built-in Output
+                </div>
+              </div>
+              <span class="text-[9px] italic block mt-2" :class="activeTheme === 'cyber' ? 'text-[#94a3b8]' : (activeTheme === 'amber' ? 'text-[#b0aea5]' : 'text-slate-500')">Required if utilizing an external sound board DI.</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- STEP 5: Simple Troubleshooting & Finish -->
+        <div x-show="wizardStep === 5" class="space-y-4" x-transition>
+          <div class="space-y-2">
+            <h2 class="text-lg font-black font-sans flex items-center gap-2" :class="activeTheme === 'amber' ? 'text-[#faf9f5]' : 'text-white'">
+              <i data-lucide="help-circle" :class="activeTheme === 'cyber' ? 'text-[#00f0ff]' : (activeTheme === 'amber' ? 'text-[#d97757]' : 'text-[#10b981]')"></i> 5. Simple Troubleshooting & Setup Launch
+            </h2>
+            <p class="text-sm font-serif leading-relaxed" :class="activeTheme === 'cyber' ? 'text-[#94a3b8]' : (activeTheme === 'amber' ? 'text-[#b0aea5]' : 'text-slate-400')">
+              If something isn't working right on-site, review these quick checks before opening the main console:
+            </p>
+          </div>
+
+          <div class="space-y-2 text-xs font-serif" x-data="{ stepFiveOpen: null }">
+            <!-- Issue 1 -->
+            <div class="border rounded-lg overflow-hidden"
+                 :class="activeTheme === 'cyber' ? 'bg-slate-950 border-slate-800' : (activeTheme === 'amber' ? 'bg-[#141413] border-[#e8e6dc]/10' : 'bg-slate-950 border-slate-850')">
+              <button @click="stepFiveOpen = stepFiveOpen === 1 ? null : 1" class="w-full text-left p-3 hover:bg-slate-900 transition flex justify-between items-center font-sans font-bold">
+                <span>The projector screen is completely black (No image)</span>
+                <i data-lucide="chevron-down" class="w-4 h-4 text-[#94a3b8] transition-transform" :class="stepFiveOpen === 1 ? 'rotate-180 text-[#00f0ff]' : ''"></i>
+              </button>
+              <div x-show="stepFiveOpen === 1" class="p-3 bg-slate-900/30 border-t text-[#94a3b8] space-y-1.5 leading-relaxed"
+                   :class="activeTheme === 'cyber' ? 'border-slate-800' : (activeTheme === 'amber' ? 'border-[#e8e6dc]/10' : 'border-slate-850')">
+                <p>1. Make sure your laptop is securely connected to physical **HDMI Input 1** on the switcher.</p>
+                <p>2. Verify the laptop signal status shows **Connected** (Step 2 check).</p>
+                <p>3. Tap **PGM 1** (Step 3 check) to make the laptop feed live on the program bus.</p>
+              </div>
+            </div>
+
+            <!-- Issue 2 -->
+            <div class="border rounded-lg overflow-hidden"
+                 :class="activeTheme === 'cyber' ? 'bg-slate-950 border-slate-800' : (activeTheme === 'amber' ? 'bg-[#141413] border-[#e8e6dc]/10' : 'bg-slate-950 border-slate-850')">
+              <button @click="stepFiveOpen = stepFiveOpen === 2 ? null : 2" class="w-full text-left p-3 hover:bg-slate-900 transition flex justify-between items-center font-sans font-bold">
+                <span>The TV monitor or display has a purple or pink tint</span>
+                <i data-lucide="chevron-down" class="w-4 h-4 text-[#94a3b8] transition-transform" :class="stepFiveOpen === 2 ? 'rotate-180 text-[#00f0ff]' : ''"></i>
+              </button>
+              <div x-show="stepFiveOpen === 2" class="p-3 bg-slate-900/30 border-t text-[#94a3b8] space-y-2 leading-relaxed"
+                   :class="activeTheme === 'cyber' ? 'border-slate-800' : (activeTheme === 'amber' ? 'border-[#e8e6dc]/10' : 'border-slate-850')">
+                <p>This YPbPr mismatch occurs on older monitors. To fix it, you will need to force HDMI OUT 3's output color space directly to RGB:</p>
+                <div class="p-2 bg-slate-900 rounded border border-[#ff3366]/20 text-[#ff3366] font-mono text-[10px]">
+                  Go to Expert Mode &rarr; [MENU] &rarr; VIDEO OUTPUT &rarr; HDMI OUT 3 &rarr; COLOR SPACE &rarr; RGB (0-255).
+                </div>
+                <img src="./1623725145_IMG_1550679.jpg" class="max-w-xs rounded border block mx-auto mt-2" 
+                     :class="activeTheme === 'cyber' ? 'border-slate-800' : (activeTheme === 'amber' ? 'border-[#e8e6dc]/10' : 'border-slate-850')" />
+              </div>
+            </div>
+
+            <!-- Issue 3 -->
+            <div class="border rounded-lg overflow-hidden"
+                 :class="activeTheme === 'cyber' ? 'bg-slate-950 border-slate-800' : (activeTheme === 'amber' ? 'bg-[#141413] border-[#e8e6dc]/10' : 'bg-slate-950 border-slate-850')">
+              <button @click="stepFiveOpen = stepFiveOpen === 3 ? null : 3" class="w-full text-left p-3 hover:bg-slate-900 transition flex justify-between items-center font-sans font-bold">
+                <span>No sound is coming out of the room speakers</span>
+                <i data-lucide="chevron-down" class="w-4 h-4 text-[#94a3b8] transition-transform" :class="stepFiveOpen === 3 ? 'rotate-180 text-[#00f0ff]' : ''"></i>
+              </button>
+              <div x-show="stepFiveOpen === 3" class="p-3 bg-slate-900/30 border-t text-[#94a3b8] space-y-2 leading-relaxed"
+                   :class="activeTheme === 'cyber' ? 'border-slate-800' : (activeTheme === 'amber' ? 'border-[#e8e6dc]/10' : 'border-slate-850')">
+                <p>Ensure the laptop itself has its system sound unmuted. Choose the correct volume target depending on your cable route:</p>
+                <ul class="list-disc list-inside pl-1 space-y-1 text-slate-300">
+                  <li><strong>HDMI Connection (Option A)</strong>: Set laptop volume strictly to <strong>40%</strong> to prevent pre-mixer clipping.</li>
+                  <li><strong>DI Box / Headphone Jack (Option B)</strong>: Set laptop volume to at least <strong>95%</strong> (to ensure a strong signal gets to the audio board).</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Wizard Nav Footer (Inside Card) -->
+        <div class="flex flex-col gap-4 pt-6 border-t font-sans mt-4"
+             :class="activeTheme === 'cyber' ? 'border-slate-800' : (activeTheme === 'amber' ? 'border-[#e8e6dc]/10' : 'border-slate-850')">
+          
+          <!-- JOKE TRIGGER BUTTON (Only visible on Step 5) -->
+          <div x-show="wizardStep === 5" class="flex justify-center w-full" x-cloak>
+            <button @click="showNedryJoke = true" 
+                    class="py-2.5 px-5 bg-red-600/10 hover:bg-red-600/20 border border-red-500/30 text-red-500 font-extrabold text-xs rounded-xl transition animate-pulse cursor-pointer shadow-md flex items-center gap-1.5 glow-pgm">
+              <i data-lucide="terminal"></i> Execute entire setup automatically - push here
+            </button>
+          </div>
+
+          <div class="flex justify-between items-center w-full">
+            <button @click="prevWizardStep()" 
+                    :disabled="wizardStep === 1" 
+                    class="px-4 py-2 bg-slate-900/50 border text-[#ffffff] font-bold text-xs rounded-lg transition hover:bg-slate-800 disabled:opacity-40 disabled:hover:bg-transparent cursor-pointer"
+                    :class="activeTheme === 'cyber' ? 'border-slate-800' : (activeTheme === 'amber' ? 'border-[#e8e6dc]/10' : 'border-slate-850')">
+              &larr; Back
+            </button>
+            
+            <div class="text-xs font-bold text-[#94a3b8]">
+              <span x-text="wizardStep"></span> / 5 Completed
+            </div>
+
+            <button @click="nextWizardStep()" 
+                    x-show="wizardStep < 5"
+                    class="px-4 py-2 font-bold text-xs rounded-lg transition cursor-pointer"
+                    :class="activeTheme === 'cyber' ? 'bg-[#00f0ff] hover:bg-[#00f0ff]/90 text-[#080c14] glow-cyan' : (activeTheme === 'amber' ? 'bg-[#d97757] hover:bg-[#d97757]/90 text-[#141413] glow-orange' : 'bg-[#10b981] hover:bg-[#10b981]/90 text-white glow-green')">
+              Next Step &rarr;
+            </button>
+            <button @click="finishWizard()" 
+                    x-show="wizardStep === 5"
+                    class="px-5 py-2 bg-[#10b981] hover:bg-[#10b981]/90 text-[#ffffff] font-bold text-xs rounded-lg transition glow-green animate-pulse font-extrabold cursor-pointer">
+              Finish & Open Console
+            </button>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+
+    <!-- ========================================== -->
+    <!-- EXPERT MODE: COMPLETE TACTICAL CONSOLE     -->
+    <!-- ========================================== -->
+    <div x-show="expertMode" class="space-y-6" x-transition:enter="transition ease-out duration-200" x-cloak>
+      
+      <!-- TAB: PATCH BAY -->
+      <div x-show="activeTab === 'patchbay'" class="space-y-6" x-transition:enter="transition ease-out duration-200">
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          
+          <!-- Interactive Port Map (2/3 width) -->
+          <div class="lg:col-span-2 backdrop-blur-lg bg-slate-900/50 border rounded-2xl p-6 shadow-xl space-y-6"
+               :class="activeTheme === 'cyber' ? 'border-slate-800' : (activeTheme === 'amber' ? 'border-[#e8e6dc]/10' : 'border-slate-850')">
+            <div class="flex justify-between items-center border-b pb-4"
+                 :class="activeTheme === 'cyber' ? 'border-slate-800/80' : (activeTheme === 'amber' ? 'border-[#e8e6dc]/10' : 'border-slate-850')">
+              <div>
+                <h2 class="text-base font-bold text-[#ffffff] flex items-center gap-2 font-sans">
+                  <i data-lucide="cable" :class="activeTheme === 'cyber' ? 'text-[#00f0ff]' : (activeTheme === 'amber' ? 'text-[#d97757]' : 'text-[#10b981]')"></i> Interactive Rear-Panel Patch Bay
+                </h2>
+                <p class="text-xs text-[#94a3b8] mt-0.5">Click any port to configure input mappings, signal formats, and view live status.</p>
+              </div>
+              <span class="text-[10px] font-mono bg-slate-950 border border-slate-800 text-[#94a3b8] px-2 py-1 rounded">REAR CHASSIS</span>
+            </div>
+
+            <!-- INPUT PORTS -->
+            <div class="space-y-4">
+              <h3 class="text-xs font-bold tracking-wider text-[#94a3b8] uppercase font-sans">Input Connectors</h3>
+              
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 font-sans">
+                <!-- HDMI Inputs (1-8) -->
+                <div class="bg-slate-950 p-4 rounded-xl border border-slate-800 space-y-3 shadow-inner">
+                  <div class="flex justify-between items-center">
+                    <span class="text-xs font-bold text-[#ffffff] font-mono">HDMI INPUTS 1-8</span>
+                    <span class="w-1.5 h-1.5 rounded-full" :class="activeTheme === 'cyber' ? 'bg-[#3b82f6]' : (activeTheme === 'amber' ? 'bg-[#d97757]' : 'bg-[#10b981]')"></span>
+                  </div>
+                  <div class="grid grid-cols-4 gap-2">
+                    <template x-for="input in inputs.filter(i => i.type === 'HDMI')" :key="input.id">
+                      <button @click="selectInput(input)" 
+                              class="p-2 border rounded-lg flex flex-col items-center gap-1 transition relative group cursor-pointer shadow-[inset_0_1px_0_rgba(255,255,255,0.05)]"
+                              :class="getInputButtonClass(input)">
+                        <!-- Active indicator LED -->
+                        <span class="w-1.5 h-1.5 rounded-full absolute top-1 right-1" :class="getInputLEDClass(input)"></span>
+                        <span class="text-[9px] font-bold font-mono text-[#94a3b8]" x-text="`IN ${input.num}`"></span>
+                        <span class="text-[10px] font-extrabold max-w-full truncate text-center text-[#ffffff] mt-1" x-text="input.label"></span>
+                      </button>
+                    </template>
+                  </div>
+                </div>
+
+                <!-- SDI Inputs (1-8) -->
+                <div class="bg-slate-950 p-4 rounded-xl border border-slate-800 space-y-3 shadow-inner">
+                  <div class="flex justify-between items-center">
+                    <span class="text-xs font-bold text-[#ffffff] font-mono">SDI INPUTS 1-8</span>
+                    <span class="w-1.5 h-1.5 rounded-full" :class="activeTheme === 'cyber' ? 'bg-[#3b82f6]' : (activeTheme === 'amber' ? 'bg-[#d97757]' : 'bg-[#10b981]')"></span>
+                  </div>
+                  <div class="grid grid-cols-4 gap-2">
+                    <template x-for="input in inputs.filter(i => i.type === 'SDI')" :key="input.id">
+                      <button @click="selectInput(input)" 
+                              class="p-2 border rounded-lg flex flex-col items-center gap-1 transition relative group cursor-pointer shadow-[inset_0_1px_0_rgba(255,255,255,0.05)]"
+                              :class="getInputButtonClass(input)">
+                        <!-- Active indicator LED -->
+                        <span class="w-1.5 h-1.5 rounded-full absolute top-1 right-1" :class="getInputLEDClass(input)"></span>
+                        <span class="text-[9px] font-bold font-mono text-[#94a3b8]" x-text="`IN ${input.num}`"></span>
+                        <span class="text-[10px] font-extrabold max-w-full truncate text-center text-[#ffffff] mt-1" x-text="input.label"></span>
+                      </button>
+                    </template>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- OUTPUT PORTS -->
+            <div class="space-y-4 pt-2 border-t border-slate-800 font-sans">
+              <h3 class="text-xs font-bold tracking-wider text-[#94a3b8] uppercase font-sans">Output Connectors</h3>
+              
+              <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                <!-- SDI Outputs (1-3) -->
+                <div class="bg-slate-950 p-4 rounded-xl border border-slate-800 space-y-3 col-span-2 shadow-inner">
+                  <span class="text-xs font-bold text-[#ffffff] block font-mono">SDI OUTPUTS (75Ω BNC)</span>
+                  <div class="grid grid-cols-3 gap-2">
+                    <!-- SDI 1 -->
+                    <div class="p-2.5 bg-slate-900/50 border border-slate-800 rounded-lg flex flex-col items-center relative shadow-[inset_0_1px_0_rgba(255,255,255,0.05)]">
+                      <span class="absolute top-1 right-1 w-2 h-2 rounded-full bg-[#10b981] glow-green"></span>
+                      <span class="text-[9px] font-mono text-[#94a3b8] font-bold">SDI OUT 1</span>
+                      <span class="text-xs font-extrabold text-[#ffffff] mt-1">Left Projector</span>
+                      <span class="text-[9px] text-[#10b981] bg-slate-950 border border-slate-800 px-2 py-0.5 rounded mt-1.5 font-mono">PGM BUS</span>
+                    </div>
+                    <!-- SDI 2 -->
+                    <div class="p-2.5 bg-slate-900/50 border border-slate-800 rounded-lg flex flex-col items-center relative shadow-[inset_0_1px_0_rgba(255,255,255,0.05)]">
+                      <span class="absolute top-1 right-1 w-2 h-2 rounded-full bg-[#10b981] glow-green"></span>
+                      <span class="text-[9px] font-mono text-[#94a3b8] font-bold">SDI OUT 2</span>
+                      <span class="text-xs font-extrabold text-[#ffffff] mt-1">Right Projector</span>
+                      <span class="text-[9px] text-[#10b981] bg-slate-950 border border-slate-800 px-2 py-0.5 rounded mt-1.5 font-mono">PGM BUS</span>
+                    </div>
+                    <!-- SDI 3 (Conditional) -->
+                    <div class="p-2.5 rounded-lg flex flex-col items-center transition duration-300 relative animate-all shadow-[inset_0_1px_0_rgba(255,255,255,0.05)]"
+                         :class="config.centerProj ? 'bg-slate-900/50 border border-[#10b981]/40' : 'bg-slate-900/10 border border-slate-800/40 opacity-40'">
+                      <span x-show="config.centerProj" class="absolute top-1 right-1 w-2 h-2 rounded-full bg-[#10b981] glow-green"></span>
+                      <span class="text-xs font-extrabold mt-1" :class="config.centerProj ? 'text-[#ffffff]' : 'text-slate-800'">
+                        <span x-text="config.centerProj ? 'Center / DSM' : 'UNUSED'"></span>
+                      </span>
+                      <span class="text-[9px] bg-slate-950 border px-2 py-0.5 rounded mt-1.5 font-mono"
+                            :class="config.centerProj ? 'text-[#10b981] border-slate-800' : 'text-slate-900 border-transparent'">PGM BUS</span>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- HDMI Outputs (1-3) -->
+                <div class="bg-slate-950 p-4 rounded-xl border border-slate-800 space-y-3 col-span-1 shadow-inner">
+                  <span class="text-xs font-bold text-[#ffffff] block font-mono">HDMI OUTPUTS</span>
+                  <div class="space-y-2">
+                    <div class="flex items-center justify-between p-2 bg-slate-900/50 border border-slate-800 rounded-lg">
+                      <span class="text-[10px] font-mono font-bold text-[#94a3b8]">HDMI 1/2:</span>
+                      <span class="text-xs font-bold text-[#ffffff]">Local / Decimators</span>
+                    </div>
+                    <!-- HDMI 3 (Multiview) -->
+                    <div class="p-2.5 bg-slate-900/50 border rounded-lg flex flex-col relative shadow-[inset_0_1px_0_rgba(255,255,255,0.05)]" 
+                         :class="config.dviMonitor ? (activeTheme === 'cyber' ? 'border-[#00f0ff]/40 shadow-inner' : (activeTheme === 'amber' ? 'border-[#d97757]/45' : 'border-[#10b981]/40')) : 'border-slate-800'">
+                      <span class="absolute top-1.5 right-2 w-2 h-2 rounded-full bg-[#10b981] glow-green"></span>
+                      <span class="text-[9px] font-mono text-[#94a3b8] font-bold">HDMI OUT 3</span>
+                      <span class="text-xs font-bold text-[#ffffff] mt-0.5">Multi-View (24")</span>
+                      
+                      <div class="flex flex-wrap gap-1 mt-1.5">
+                        <span class="text-[8px] bg-slate-950 border border-slate-800 text-[#ffffff] px-1.5 rounded font-mono font-bold">1080P MV</span>
+                        <span x-show="config.dviMonitor" class="text-[8px] px-1.5 rounded font-mono font-bold animate-pulse"
+                              :class="activeTheme === 'cyber' ? 'bg-[#00f0ff]/20 border-[#00f0ff]/40 text-[#00f0ff] glow-cyan' : (activeTheme === 'amber' ? 'bg-[#d97757]/20 border-[#d97757]/40 text-[#d97757] glow-orange' : 'bg-[#10b981]/20 border-[#10b981]/40 text-[#10b981] glow-green')">FORCE RGB</span>
+                        <span x-show="config.producerDA" class="text-[8px] bg-blue-950 border border-blue-900/50 text-[#3b82f6] px-1.5 rounded font-mono font-bold">DA OUT</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Port Configurator sidebar (1/3 width) -->
+          <div class="backdrop-blur-lg bg-slate-900/50 border rounded-2xl p-6 shadow-xl flex flex-col justify-between"
+               :class="activeTheme === 'cyber' ? 'border-slate-800' : (activeTheme === 'amber' ? 'border-[#e8e6dc]/10' : 'border-slate-850')">
+            <div class="space-y-6">
+              <h2 class="text-base font-bold text-[#ffffff] flex items-center gap-2 pb-4 border-b font-sans"
+                  :class="activeTheme === 'cyber' ? 'border-slate-800/80' : (activeTheme === 'amber' ? 'border-[#e8e6dc]/10' : 'border-slate-850')">
+                <i data-lucide="sliders" :class="activeTheme === 'cyber' ? 'text-[#00f0ff]' : (activeTheme === 'amber' ? 'text-[#d97757]' : 'text-[#10b981]')"></i> Port Inspector
+              </h2>
+
+              <!-- When NO input is selected -->
+              <div x-show="!selectedInputData" class="py-12 text-center space-y-3 font-serif">
+                <div class="w-12 h-12 rounded-full bg-slate-950 border border-slate-800 flex items-center justify-center mx-auto text-[#94a3b8]">
+                  <i data-lucide="mouse-pointer-click" class="w-6 h-6"></i>
+                </div>
+                <p class="text-xs text-[#94a3b8] leading-relaxed px-4">Click on any input port on the rear-panel to inspect properties, adjust EDID tags, and customize titles.</p>
+              </div>
+
+              <!-- When input IS selected -->
+              <div x-show="selectedInputData" class="space-y-4" x-cloak>
+                <div class="flex items-center justify-between font-sans">
+                  <span class="text-xs font-mono font-bold bg-slate-950 border px-2.5 py-1 rounded" 
+                        :class="activeTheme === 'cyber' ? 'text-[#00f0ff] border-[#00f0ff]/20 glow-cyan' : (activeTheme === 'amber' ? 'text-[#d97757] border-[#d97757]/20 glow-orange' : 'text-[#10b981] border-[#10b981]/20 glow-green')" x-text="`${selectedInputData?.type} Port ${selectedInputData?.num}`"></span>
+                  <!-- Switcher assignment indicator -->
+                  <span class="text-[9px] font-mono px-2 py-0.5 rounded border" :class="getSignalBadgeClass(selectedInputData)" x-text="getSignalBadgeText(selectedInputData)"></span>
+                </div>
+
+                <!-- Label Edit -->
+                <div class="space-y-1.5">
+                  <label class="text-[10px] font-bold tracking-wider text-[#94a3b8] uppercase font-sans">Custom Friendly Label</label>
+                  <input type="text" x-model="selectedInputData.label" @input="saveState()" 
+                         class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-sm focus:outline-none font-medium text-[#f8fafc]"
+                         :class="activeTheme === 'cyber' ? 'focus:border-[#00f0ff]' : (activeTheme === 'amber' ? 'focus:border-[#d97757]' : 'focus:border-[#10b981]')">
+                </div>
+
+                <!-- Signal Type Selector -->
+                <div class="space-y-1.5">
+                  <label class="text-[10px] font-bold tracking-wider text-[#94a3b8] uppercase font-sans">Source Device Type</label>
+                  <select x-model="selectedInputData.sourceType" @change="saveState()"
+                          class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-xs focus:outline-none font-medium text-[#f8fafc]"
+                          :class="activeTheme === 'cyber' ? 'focus:border-[#00f0ff]' : (activeTheme === 'amber' ? 'focus:border-[#d97757]' : 'focus:border-[#10b981]')">
+                    <option value="PTZ Camera">PTZ Camera</option>
+                    <option value="Client Laptop">Client Laptop</option>
+                    <option value="Media Server">Media Server (ProPresenter)</option>
+                    <option value="Graphics PC">Graphics PC</option>
+                    <option value="Playpack / Video">Playback Deck</option>
+                    <option value="None">Unused Port</option>
+                  </select>
+                </div>
+
+                <!-- Format Selector -->
+                <div class="space-y-1.5">
+                  <label class="text-[10px] font-bold tracking-wider text-[#94a3b8] uppercase font-sans">Input Format / EDID</label>
+                  <select x-model="selectedInputData.format" @change="saveState()"
+                          class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-xs focus:outline-none font-mono text-[#f8fafc]"
+                          :class="activeTheme === 'cyber' ? 'focus:border-[#00f0ff]' : (activeTheme === 'amber' ? 'focus:border-[#d97757]' : 'focus:border-[#10b981]')">
+                    <option value="1920x1080 @ 59.94p">1920x1080 @ 59.94p (FHD)</option>
+                    <option value="1920x1080 @ 59.94i">1920x1080 @ 59.94i (Interlaced)</option>
+                    <option value="1920x1080 @ 60.00p">1920x1080 @ 60.00p (Computer)</option>
+                    <option value="1280x720 @ 59.94p">1280x720 @ 59.94p (HD)</option>
+                  </select>
+                </div>
+
+                <!-- Signal Status Switch -->
+                <div class="space-y-2 pt-2 border-t border-slate-800">
+                  <span class="text-[10px] font-bold tracking-wider text-[#94a3b8] uppercase block font-sans">Simulate physical connection</span>
+                  <div class="flex items-center justify-between p-2 rounded-lg bg-slate-950 border border-slate-800 shadow-inner">
+                    <span class="text-xs text-[#94a3b8]">Carrier Signal Connected</span>
+                    <label class="relative inline-flex items-center cursor-pointer">
+                      <input type="checkbox" x-model="selectedInputData.connected" @change="updateInputConnection(selectedInputData)" class="sr-only peer">
+                      <div class="w-9 h-5 bg-slate-850 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:rounded-full after:h-4 after:w-4 after:transition-all"
+                           :class="activeTheme === 'cyber' ? 'peer-checked:bg-[#10b981] after:bg-[#94a3b8] peer-checked:after:bg-[#080c14]' : (activeTheme === 'amber' ? 'peer-checked:bg-[#d97757] after:bg-[#b0aea5] peer-checked:after:bg-[#141413]' : 'peer-checked:bg-[#10b981] after:bg-[#94a3b8] peer-checked:after:bg-[#04080f]')"></div>
+                    </label>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Bottom Action Buttons -->
+            <div class="pt-6 border-t border-slate-800/80 flex gap-2 font-sans">
+              <button @click="resetInputs()" class="flex-1 py-2 px-3 border bg-slate-950 hover:bg-slate-900 rounded-lg text-xs font-semibold tracking-wide text-[#94a3b8] hover:text-[#f8fafc] transition font-bold shadow-[inset_0_1px_0_rgba(255,255,255,0.05)] cursor-pointer"
+                      :class="activeTheme === 'cyber' ? 'border-slate-800 hover:border-[#00f0ff]/40' : (activeTheme === 'amber' ? 'border-[#e8e6dc]/15 hover:border-[#d97757]/45' : 'border-slate-855 hover:border-[#10b981]/40')">
+                Reset Board Setup
+              </button>
+              <button x-show="selectedInputData" @click="selectedInputData = null" class="py-2 px-3 bg-slate-850 hover:bg-slate-800 text-[#f8fafc] rounded-lg text-xs font-semibold tracking-wide transition font-bold cursor-pointer font-bold">
+                Close
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- TAB: STARTUP CHECKLIST -->
+      <div x-show="activeTab === 'checklist'" class="space-y-6" x-transition:enter="transition ease-out duration-200">
+        <div class="flex justify-between items-center">
+          <div>
+            <h2 class="text-base font-bold text-[#ffffff] flex items-center gap-2 font-sans">
+              <i data-lucide="check-square" :class="activeTheme === 'cyber' ? 'text-[#00f0ff]' : (activeTheme === 'amber' ? 'text-[#d97757]' : 'text-[#10b981]')"></i> Interactive Run-Sheet Tasks
+            </h2>
+            <p class="text-xs text-[#94a3b8] font-serif">Complete tasks in sequence. Click the camera icon next to steps to inspect reference screen photos.</p>
+          </div>
+          <div class="flex gap-2 font-sans">
+            <button @click="resetChecklist()" class="text-xs bg-slate-950 hover:bg-slate-900 border border-slate-800 hover:border-slate-700 text-[#f8fafc] px-3 py-1.5 rounded-lg transition font-semibold cursor-pointer">
+              Clear Checklist
+            </button>
+            <button @click="checkAllChecklist()" class="text-xs px-3 py-1.5 rounded-lg transition font-bold cursor-pointer border"
+                    :class="activeTheme === 'cyber' ? 'bg-[#00f0ff]/10 border-[#00f0ff]/30 text-[#00f0ff] glow-cyan' : (activeTheme === 'amber' ? 'bg-[#d97757]/10 border-[#d97757]/30 text-[#d97757] glow-orange' : 'bg-[#10b981]/10 border-[#10b981]/30 text-[#10b981] glow-green')">
+              Complete All
+            </button>
+          </div>
+        </div>
+
+        <!-- Checklist Phases -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <template x-for="(phase, phaseIdx) in phases" :key="phase.title">
+            <div class="backdrop-blur-lg bg-slate-900/50 border rounded-2xl overflow-hidden shadow-xl flex flex-col justify-between"
+                 :class="activeTheme === 'cyber' ? 'border-slate-800' : (activeTheme === 'amber' ? 'border-[#e8e6dc]/10' : 'border-slate-850')">
+              <!-- Phase Title Header -->
+              <div class="bg-slate-950 px-4 py-3.5 border-b border-slate-800/80 flex justify-between items-center font-sans">
+                <h3 class="font-bold text-xs tracking-wider text-[#ffffff] uppercase flex items-center gap-2">
+                  <span class="text-[10px] font-mono bg-slate-900 border text-center w-5 h-5 rounded-full flex items-center justify-center font-bold" 
+                        :class="activeTheme === 'cyber' ? 'border-[#00f0ff]/20 text-[#00f0ff] glow-cyan' : (activeTheme === 'amber' ? 'border-[#d97757]/20 text-[#d97757] glow-orange' : 'border-[#10b981]/20 text-[#10b981] glow-green')" x-text="phaseIdx + 1"></span>
+                  <span x-text="phase.title"></span>
+                </h3>
+                <span class="text-[10px] font-mono font-bold text-[#94a3b8] bg-slate-900 border border-slate-800 px-2 py-0.5 rounded" x-text="`${getPhaseCompletedCount(phase)} / ${getPhaseTotalCount(phase)}`"></span>
+              </div>
+
+              <!-- Steps list -->
+              <div class="divide-y divide-slate-800 flex-1">
+                <template x-for="(step, stepIdx) in phase.steps" :key="step.label">
+                  <!-- If step is visible based on configuration parameters -->
+                  <div x-show="isStepVisible(step)" class="p-4 flex items-start gap-3 hover:bg-slate-900/20 transition">
+                    <input type="checkbox" x-model="step.completed" @change="saveState()"
+                           class="mt-1 rounded bg-slate-950 border-slate-800 h-4.5 w-4.5 cursor-pointer transition"
+                           :class="activeTheme === 'cyber' ? 'text-[#00f0ff] focus:ring-[#00f0ff]' : (activeTheme === 'amber' ? 'text-[#d97757] focus:ring-[#d97757]' : 'text-[#10b981] focus:ring-[#10b981]')">
+                    <div class="flex-1 space-y-1">
+                      <div class="flex flex-wrap items-center justify-between gap-1.5 font-sans">
+                        <span class="text-xs font-bold text-[#ffffff] transition" :class="step.completed ? 'line-through text-[#94a3b8]' : ''" x-text="step.label"></span>
+                        <div class="flex items-center gap-2">
+                          <!-- Show screenshot guide button if image exists -->
+                          <button x-show="step.image" @click="openImage(step.image, step.label, step.imageDesc || step.desc)" 
+                                  class="inline-flex items-center gap-1 px-2 py-0.5 rounded border border-slate-800 hover:border-[#00f0ff]/40 bg-slate-900/50 hover:bg-[#00f0ff]/10 text-[9px] font-mono text-[#94a3b8] hover:text-[#00f0ff] transition font-bold cursor-pointer"
+                                  :class="activeTheme === 'amber' ? 'hover:text-[#d97757] hover:border-[#d97757]/40' : ''">
+                            <i data-lucide="camera" class="w-3 h-3"></i> Screen Menu
+                          </button>
+                          <span class="text-[9px] font-mono bg-slate-950 text-[#94a3b8] border border-slate-800 px-2 py-0.5 rounded font-bold" x-text="step.menu"></span>
+                        </div>
+                      </div>
+                      <p class="text-[11px] text-[#94a3b8] leading-relaxed font-serif" x-text="step.desc"></p>
+                      
+                      <!-- Selective warning details -->
+                      <div x-show="step.tip" class="text-[10px] bg-slate-950 p-2 rounded border flex gap-1.5 items-start mt-1.5 font-serif"
+                           :class="activeTheme === 'cyber' ? 'border-[#00f0ff]/20 text-[#00f0ff] glow-cyan' : (activeTheme === 'amber' ? 'border-[#d97757]/20 text-[#d97757] glow-orange' : 'border-[#10b981]/20 text-[#10b981] glow-green')">
+                        <i data-lucide="lightbulb" class="w-3.5 h-3.5 shrink-0 mt-0.5"></i>
+                        <span x-html="step.tip"></span>
+                      </div>
+                    </div>
+                  </div>
+                </template>
+              </div>
+            </div>
+          </template>
+        </div>
+      </div>
+
+      <!-- TAB: AUDIO MIXER -->
+      <div x-show="activeTab === 'audio'" class="space-y-6" x-transition:enter="transition ease-out duration-200">
+        
+        <!-- Top info bar -->
+        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
+          <div>
+            <h2 class="text-base font-bold text-[#ffffff] flex items-center gap-2 font-sans">
+              <i data-lucide="sliders" :class="activeTheme === 'cyber' ? 'text-[#00f0ff]' : (activeTheme === 'amber' ? 'text-[#d97757]' : 'text-[#10b981]')"></i> Virtual Audio Mixer Console
+            </h2>
+            <p class="text-xs text-[#94a3b8] font-serif">Tactical gain-staging faders. Slide fader to inspect simulated dB levels and VU meter alerts.</p>
+          </div>
+          <button @click="optimizeAudioLevels()" class="text-xs px-3 py-2 rounded-lg font-bold transition flex items-center gap-1.5 font-sans cursor-pointer border"
+                  :class="activeTheme === 'cyber' ? 'bg-[#00f0ff]/10 border-[#00f0ff]/30 text-[#00f0ff] glow-cyan' : (activeTheme === 'amber' ? 'bg-[#d97757]/10 border-[#d97757]/30 text-[#d97757] glow-orange' : 'bg-[#10b981]/10 border-[#10b981]/30 text-[#10b981] glow-green')">
+            <i data-lucide="wand-2" class="w-3.5 h-3.5"></i> Optimize Gain Staging
+          </button>
+        </div>
+
+        <!-- Fader Desk grid -->
+        <div class="grid grid-cols-1 lg:grid-cols-4 gap-6">
+          
+          <!-- Faders Container (3/4 width) -->
+          <div class="lg:col-span-3 backdrop-blur-lg bg-slate-900/50 border rounded-2xl p-6 shadow-xl space-y-6 animate-all"
+               :class="activeTheme === 'cyber' ? 'border-slate-800' : (activeTheme === 'amber' ? 'border-[#e8e6dc]/10' : 'border-slate-850')">
+            <div class="grid grid-cols-6 gap-2 sm:gap-4 h-[320px] font-sans">
+              <template x-for="(fader, index) in faders" :key="fader.id">
+                <div class="flex flex-col items-center justify-between h-full bg-slate-950 border border-slate-800 p-2 sm:p-3 rounded-xl relative group shadow-inner">
+                  <!-- Fader Channel Name -->
+                  <span class="text-[9px] font-bold text-[#94a3b8] tracking-wider text-center uppercase font-mono" x-text="fader.name"></span>
+                  
+                  <!-- Meter and Slider Panel -->
+                  <div class="flex items-center gap-2 h-[200px] w-full justify-center">
+                    <!-- Simulated LED VU meter -->
+                    <div class="w-2 bg-slate-950 h-full rounded flex flex-col justify-end overflow-hidden border border-slate-800 relative">
+                      <!-- Dynamic level fill -->
+                      <div class="w-full transition-all duration-75" 
+                           :class="getVUClass(fader)"
+                           :style="`height: ${getVUHeight(fader)}%`"></div>
+                      
+                      <!-- Clipping light indicator -->
+                      <div x-show="isVUClip(fader)" class="w-2 h-2 rounded-full bg-[#ff3366] absolute top-0 left-0 glow-pgm animate-pulse"></div>
+                    </div>
+
+                    <!-- Vertical slider input -->
+                    <div class="h-full py-2 flex flex-col justify-center relative">
+                      <input type="range" min="0" max="100" x-model="fader.level" 
+                             class="cursor-pointer h-full -rotate-180 w-6" 
+                             :class="activeTheme === 'cyber' ? 'accent-[#00f0ff]' : (activeTheme === 'amber' ? 'accent-[#d97757]' : 'accent-[#10b981]')"
+                             style="writing-mode: bt-lr; -webkit-appearance: slider-vertical;">
+                    </div>
+                  </div>
+
+                  <!-- Numerical value and status -->
+                  <div class="text-center space-y-1 w-full">
+                    <span class="text-[10px] font-mono text-[#ffffff] block font-bold font-sans" x-text="getFaderLevelText(fader.level)"></span>
+                    <button @click="toggleMute(fader)" 
+                            class="w-full py-0.5 text-[9px] font-bold tracking-wider rounded transition cursor-pointer" 
+                            :class="fader.muted ? 'bg-red-500/20 border border-red-500/40 text-red-400 animate-pulse glow-pgm' : 'bg-slate-900 border border-slate-800 text-[#94a3b8] hover:text-[#f8fafc]'">
+                      <span x-text="fader.muted ? 'MUTED' : 'ACTIVE'"></span>
+                    </button>
+                  </div>
+                </div>
+              </template>
+            </div>
+
+            <!-- Quick Tips Panel -->
+            <div class="bg-slate-950 p-4 border border-slate-800 rounded-xl space-y-3 font-serif shadow-inner">
+              <h3 class="text-xs font-bold text-[#ffffff] flex items-center gap-1.5 font-sans">
+                <i data-lucide="shield-alert" class="w-4 h-4 text-[#ff3366]"></i> Gain-Staging Golden Rules
+              </h3>
+              <ul class="text-[11px] text-[#94a3b8] space-y-2 leading-relaxed">
+                <li class="flex items-start gap-2">
+                  <span class="w-1.5 h-1.5 bg-[#ff3366] rounded-full mt-1.5 shrink-0"></span>
+                  <span><strong>Mute Unused Analog Inputs</strong>: Keep Mic 1/Mic 2 muted if no active microphone is physical patched to block baseline pre-amp buzz.</span>
+                </li>
+                <li class="flex items-start gap-2">
+                  <span class="w-1.5 h-1.5 rounded-full mt-1.5 shrink-0" :class="activeTheme === 'cyber' ? 'bg-[#00f0ff]' : (activeTheme === 'amber' ? 'bg-[#d97757]' : 'bg-[#10b981]')"></span>
+                  <span><strong>Target Computer Output 40% (HDMI)</strong>: Set laptop volume strictly to 40% if running audio over the HDMI line to protect inputs from pre-mixer digital clipping.</span>
+                </li>
+                <li class="flex items-start gap-2">
+                  <span class="w-1.5 h-1.5 rounded-full mt-1.5 shrink-0" :class="activeTheme === 'cyber' ? 'bg-[#10b981]' : (activeTheme === 'amber' ? 'bg-[#10b981]' : 'bg-[#10b981]')"></span>
+                  <span><strong>DI Box output 95%+</strong>: If routing audio via the laptop headphone jack through a DI box, push laptop volume to at least 95% to maintain signal-to-noise strength.</span>
+                </li>
+              </ul>
+            </div>
+          </div>
+
+          <!-- Audio Diagnostics / Presets (1/4 width) -->
+          <div class="backdrop-blur-lg bg-slate-900/50 border rounded-2xl p-6 shadow-xl space-y-6"
+               :class="activeTheme === 'cyber' ? 'border-slate-800' : (activeTheme === 'amber' ? 'border-[#e8e6dc]/10' : 'border-slate-850')">
+            <h2 class="text-base font-bold text-[#ffffff] flex items-center gap-2 pb-4 border-b font-sans"
+                :class="activeTheme === 'cyber' ? 'border-slate-800/80' : (activeTheme === 'amber' ? 'border-[#e8e6dc]/10' : 'border-slate-850')">
+              <i data-lucide="sliders-horizontal" :class="activeTheme === 'cyber' ? 'text-[#00f0ff]' : (activeTheme === 'amber' ? 'text-[#d97757]' : 'text-[#10b981]')"></i> Settings Inspector
+            </h2>
+
+            <div class="space-y-4">
+              <div class="p-3 bg-slate-950 rounded-xl border border-slate-800 space-y-2 shadow-inner">
+                <span class="text-[10px] font-bold text-[#ffffff] block font-mono">HDMI INPUT CHANNELS</span>
+                <p class="text-[11px] text-[#94a3b8] leading-relaxed font-serif">We keep HDMI In 1-8 open for client presentation laptop audio. Make sure the fader stays at unity (0.0 dB) for consistent outputs.</p>
+              </div>
+
+              <div class="p-3 bg-slate-950 rounded-xl border border-slate-800 space-y-2 shadow-inner">
+                <span class="text-[10px] font-bold text-[#ffffff] block font-mono">AUX SEND PRESET</span>
+                <p class="text-[11px] text-[#94a3b8] leading-relaxed font-serif">Mute unused AUX buses. Avoid creating loops when sending HDMI/SDI output signals back into recorders or encoders.</p>
+              </div>
+
+              <div class="p-3 bg-slate-950 rounded-xl border border-slate-800 space-y-2 shadow-inner">
+                <span class="text-[10px] font-bold text-[#ffffff] block font-mono">HEADROOM SETTINGS</span>
+                <div class="flex items-center justify-between border-t border-slate-800 pt-2 mt-1 font-sans">
+                  <span class="text-xs text-[#94a3b8]">Limit Threshold</span>
+                  <span class="text-xs font-mono font-bold text-[#ff3366]">-6.0 dB</span>
+                </div>
+                <div class="flex items-center justify-between font-sans">
+                  <span class="text-xs text-[#94a3b8]">Gate Threshold</span>
+                  <span class="text-xs font-mono font-bold text-[#94a3b8]">-45.0 dB</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- TAB: TALLY SIMULATOR -->
+      <div x-show="activeTab === 'tally'" class="space-y-6" x-transition:enter="transition ease-out duration-200">
+        
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          
+          <!-- Switcher Cross-points (2/3 width) -->
+          <div class="lg:col-span-2 backdrop-blur-lg bg-slate-900/50 border rounded-2xl p-6 shadow-xl space-y-6"
+               :class="activeTheme === 'cyber' ? 'border-slate-800' : (activeTheme === 'amber' ? 'border-[#e8e6dc]/10' : 'border-slate-850')">
+            <div class="border-b pb-4"
+                 :class="activeTheme === 'cyber' ? 'border-slate-800/80' : (activeTheme === 'amber' ? 'border-[#e8e6dc]/10' : 'border-slate-850')">
+              <h2 class="text-base font-bold text-[#ffffff] flex items-center gap-2 font-sans">
+                <i data-lucide="radio" :class="activeTheme === 'cyber' ? 'text-[#00f0ff]' : (activeTheme === 'amber' ? 'text-[#d97757]' : 'text-[#10b981]')"></i> Switcher Cross-point Simulator
+              </h2>
+              <p class="text-xs text-[#94a3b8] mt-0.5">Select Program (PGM) and Preview (PST) video channels. The Smart Tally light dynamically responds.</p>
+            </div>
+
+            <!-- Switcher Panel Graphic -->
+            <div class="bg-slate-950 p-6 rounded-2xl border border-slate-800 space-y-6 font-sans shadow-inner">
+              <!-- Program Row -->
+              <div class="space-y-2">
+                <div class="flex justify-between items-center">
+                  <span class="text-[10px] font-bold text-[#ff3366] font-mono tracking-wider">PROGRAM (PGM) BUS</span>
+                  <span class="text-[9px] text-[#94a3b8] italic">ON-AIR FEED</span>
+                </div>
+                <div class="grid grid-cols-8 gap-2">
+                  <template x-for="n in 8" :key="'pgm-'+n">
+                    <button @click="selectPGM(n)" 
+                            class="py-3 rounded-lg border font-mono font-bold text-xs transition flex flex-col items-center justify-center gap-1 cursor-pointer shadow-[inset_0_1px_0_rgba(255,255,255,0.05)]"
+                            :class="pgmCrossPoint === n ? 'bg-red-500/20 border-red-500 text-red-400 glow-pgm font-black' : 'bg-slate-900 border border-slate-800 text-[#94a3b8] hover:bg-slate-855 hover:text-[#f8fafc]'">
+                      <span class="text-[9px] text-[#94a3b8] font-sans font-bold">PGM</span>
+                      <span x-text="n"></span>
+                    </button>
+                  </template>
+                </div>
+              </div>
+
+              <!-- Preview Row -->
+              <div class="space-y-2">
+                <div class="flex justify-between items-center">
+                  <span class="text-[10px] font-bold font-mono tracking-wider" :class="activeTheme === 'cyber' ? 'text-[#00f0ff]' : (activeTheme === 'amber' ? 'text-[#d97757]' : 'text-[#10b981]')">PREVIEW (PST) BUS</span>
+                  <span class="text-[9px] text-[#94a3b8] italic">NEXT UP</span>
+                </div>
+                <div class="grid grid-cols-8 gap-2">
+                  <template x-for="n in 8" :key="'pst-'+n">
+                    <button @click="selectPST(n)" 
+                            class="py-3 rounded-lg border font-mono font-bold text-xs transition flex flex-col items-center justify-center gap-1 cursor-pointer shadow-[inset_0_1px_0_rgba(255,255,255,0.05)]"
+                            :class="pstCrossPoint === n ? (activeTheme === 'cyber' ? 'bg-[#00f0ff]/20 border-[#00f0ff] text-[#00f0ff] glow-pst font-black' : (activeTheme === 'amber' ? 'bg-[#d97757]/20 border-[#d97757] text-[#d97757] glow-orange font-black' : 'bg-[#10b981]/20 border-[#10b981] text-[#10b981] glow-green font-black')) : 'bg-slate-900 border border-slate-800 text-[#94a3b8] hover:bg-slate-855 hover:text-[#f8fafc]'">
+                      <span class="text-[9px] text-[#94a3b8] font-sans font-bold">PST</span>
+                      <span x-text="n"></span>
+                    </button>
+                  </template>
+                </div>
+              </div>
+            </div>
+
+            <!-- Switcher Settings Info -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div class="p-4 bg-slate-950 border border-slate-800 rounded-xl space-y-1.5 shadow-inner">
+                <span class="text-[10px] font-bold text-[#ffffff] block font-mono">TALLY SOURCE ROUTER</span>
+                <p class="text-xs text-[#94a3b8] leading-relaxed font-serif">Smart Tally utilizes the local network. By opening IP routes to tablets and phones, camera operators receive live status feeds without hardware tally cables.</p>
+              </div>
+              
+              <div class="p-4 bg-slate-950 border border-slate-800 rounded-xl space-y-2 font-sans shadow-inner">
+                <span class="text-[10px] font-bold text-[#ffffff] block font-mono">MOBILE TALLY MONITOR CONFIG</span>
+                <div class="flex gap-2">
+                  <select x-model="tallyInput" 
+                          class="flex-1 bg-slate-900 border border-slate-800 rounded-lg px-2 py-1.5 text-xs focus:outline-none focus:border-[#00f0ff] font-semibold text-[#f8fafc] cursor-pointer">
+                    <template x-for="input in inputs" :key="'sel-'+input.id">
+                      <option :value="input.num" x-text="`Monitor Input ${input.num} (${input.label})`" class="bg-[#080c14] text-[#f8fafc]"></option>
+                    </template>
+                  </select>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Tally Operator Screen View (1/3 width) -->
+          <div class="backdrop-blur-lg bg-slate-900/50 border border-slate-800 rounded-2xl p-6 shadow-xl flex flex-col justify-between">
+            <div class="space-y-4">
+              <div class="border-b border-slate-800/80 pb-4">
+                <h2 class="text-base font-bold text-[#ffffff] flex items-center gap-2 font-sans">
+                  <i data-lucide="smartphone" :class="activeTheme === 'cyber' ? 'text-[#00f0ff]' : (activeTheme === 'amber' ? 'text-[#d97757]' : 'text-[#10b981]')"></i> Smart Tally Operator View
+                </h2>
+                <p class="text-xs text-[#94a3b8] mt-0.5">Operator's smartphone display assigned to Input <span class="font-bold" :class="activeTheme === 'cyber' ? 'text-[#00f0ff]' : (activeTheme === 'amber' ? 'text-[#d97757]' : 'text-[#10b981]')" x-text="tallyInput"></span>.</p>
+              </div>
+
+              <!-- Virtual Smartphone screen -->
+              <div class="w-[240px] h-[400px] border-[8px] border-slate-950 bg-slate-950 rounded-3xl mx-auto shadow-2xl relative overflow-hidden flex flex-col justify-between p-4 select-none">
+                <!-- Phone notch/speaker -->
+                <div class="w-24 h-4 bg-slate-950 absolute top-0 left-1/2 -translate-x-1/2 rounded-b-xl z-20"></div>
+
+                <!-- Top UI bar -->
+                <div class="flex justify-between items-center text-[8px] font-mono text-[#94a3b8] z-10 pt-1">
+                  <span>12:00 PM</span>
+                  <span class="flex items-center gap-1 font-bold"><i data-lucide="wifi" class="w-2 h-2"></i> TALLY LIVE</span>
+                </div>
+
+                <!-- Main Tally Box -->
+                <div class="flex-1 w-full rounded-xl transition-all duration-300 flex flex-col items-center justify-center gap-2 z-10 my-4"
+                     :class="getTallyMonitorClass()">
+                  <i :data-lucide="getTallyIcon()" class="w-8 h-8 transition-transform" :class="getTallyState() !== 'OFF' ? 'scale-110' : ''"></i>
+                  <span class="text-lg font-black tracking-widest font-sans" x-text="getTallyStateText()"></span>
+                  <span class="text-[10px] font-mono opacity-80" x-text="inputs.find(i=>i.num == tallyInput)?.label"></span>
+                </div>
+
+                <!-- Bottom UI bar -->
+                <div class="text-center text-[8px] font-mono text-[#94a3b8]/60 z-10">
+                  <p class="font-bold">ROLAND SMART TALLY SYSTEM</p>
+                  <p class="text-[7px] mt-0.5">IP: 192.168.1.160/tally</p>
+                </div>
+              </div>
+            </div>
+
+            <!-- Bottom Action Buttons -->
+            <div class="pt-6 border-t border-slate-800/80 text-center font-sans">
+              <span class="text-[10px] font-mono text-[#94a3b8]">Camera Tally updates instantly when switching cross-points.</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- TAB: TROUBLESHOOTING & DIAGNOSTICS -->
+      <div x-show="activeTab === 'troubleshooting'" class="space-y-6" x-transition:enter="transition ease-out duration-200">
+        
+        <!-- Filter controls and Search Bar -->
+        <div class="backdrop-blur-lg bg-slate-900/50 border border-slate-800 p-6 rounded-2xl shadow-xl space-y-4">
+          <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+            <div>
+              <h2 class="text-base font-bold text-[#ffffff] flex items-center gap-2 font-sans">
+                <i data-lucide="help-circle" :class="activeTheme === 'cyber' ? 'text-[#00f0ff]' : (activeTheme === 'amber' ? 'text-[#d97757]' : 'text-[#10b981]')"></i> Interactive Diagnostics Hub
+              </h2>
+              <p class="text-xs text-[#94a3b8] mt-0.5">Search or filter common field errors to inspect immediate corrective workarounds.</p>
+            </div>
+            
+            <!-- Search input -->
+            <div class="relative w-full md:w-80 font-sans">
+              <span class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-[#94a3b8]">
+                <i data-lucide="search" class="w-4 h-4"></i>
+              </span>
+              <input type="text" x-model="searchQuery" placeholder="Search fixes (e.g., purple, audio, lock)..." 
+                     class="w-full bg-slate-950 border border-slate-855 rounded-lg pl-9 pr-4 py-2 text-xs focus:outline-none focus:border-[#00f0ff] font-medium text-[#f8fafc]">
+            </div>
+          </div>
+
+          <!-- Filter Tags -->
+          <div class="flex flex-wrap gap-2 pt-2 border-t border-slate-800/80 font-sans">
+            <button @click="activeFilter = 'all'" :class="activeFilter === 'all' ? (activeTheme === 'cyber' ? 'bg-[#00f0ff]/10 text-[#00f0ff] border-[#00f0ff]/20 glow-cyan' : (activeTheme === 'amber' ? 'bg-[#d97757]/10 text-[#d97757] border-[#d97757]/20 glow-orange' : 'bg-[#10b981]/10 text-[#10b981] border-[#10b981]/20 glow-green')) : 'bg-slate-950 text-[#94a3b8] border-transparent hover:border-slate-800'" class="px-3 py-1 rounded border text-[11px] font-bold transition cursor-pointer">
+              ALL SYMPTOMS
+            </button>
+            <button @click="activeFilter = 'video'" :class="activeFilter === 'video' ? 'bg-blue-900/20 text-[#3b82f6] border-[#3b82f6]/30' : 'bg-slate-950 text-[#94a3b8] border-transparent hover:border-slate-800'" class="px-3 py-1 rounded border text-[11px] font-bold transition cursor-pointer">
+              VIDEO REROUTING
+            </button>
+            <button @click="activeFilter = 'audio'" :class="activeFilter === 'audio' ? 'bg-[#10b981]/15 text-[#10b981] border-[#10b981]/30 glow-green' : 'bg-slate-950 text-[#94a3b8] border-transparent hover:border-slate-800'" class="px-3 py-1 rounded border text-[11px] font-bold transition cursor-pointer">
+              AUDIO PRE-AMPS
+            </button>
+            <button @click="activeFilter = 'network'" :class="activeFilter === 'network' ? 'bg-[#ff3366]/10 text-[#ff3366] border-[#ff3366]/30' : 'bg-slate-950 text-[#94a3b8] border-transparent hover:border-slate-800'" class="px-3 py-1 rounded border text-[11px] font-bold transition cursor-pointer font-bold">
+              NETWORK CONTROLS
+            </button>
+          </div>
+        </div>
+
+        <!-- Results list accordion -->
+        <div class="space-y-3" x-data="{ openIdx: null }">
+          <template x-for="(issue, index) in filteredIssues" :key="issue.title">
+            <div class="bg-slate-900/50 border border-slate-800 rounded-xl overflow-hidden shadow-md">
+              <!-- Header button -->
+              <button @click="openIdx = openIdx === index ? null : index"
+                      class="w-full text-left p-4 bg-slate-950 hover:bg-slate-900 transition flex justify-between items-center group font-sans">
+                <div class="flex items-center gap-3">
+                  <!-- Tag Indicator -->
+                  <span class="text-[9px] font-bold tracking-wider font-mono px-2 py-0.5 rounded border font-bold" :class="getIssueTagClass(issue.tag)" x-text="issue.tag.toUpperCase()"></span>
+                  <span class="text-xs sm:text-sm font-bold text-[#ffffff] group-hover:text-[#00f0ff]" x-text="issue.title"></span>
+                </div>
+                <i data-lucide="chevron-down" class="w-4 h-4 text-[#94a3b8] transition-transform duration-200" :class="openIdx === index ? 'rotate-180 text-[#00f0ff]' : ''"></i>
+              </button>
+
+              <!-- Detailed drawer panel -->
+              <div x-show="openIdx === index" class="p-4 bg-slate-900/30 text-xs text-[#94a3b8] space-y-3 border-t border-slate-800/80 leading-relaxed font-serif" x-cloak>
+                <div class="p-3 bg-slate-950 rounded border flex items-start gap-2.5 font-mono"
+                     :class="activeTheme === 'cyber' ? 'border-[#00f0ff]/20 text-[#00f0ff] glow-cyan' : (activeTheme === 'amber' ? 'border-[#d97757]/20 text-[#d97757] glow-orange' : 'border-[#10b981]/20 text-[#10b981] glow-green')">
+                  <i data-lucide="shield-alert" class="w-4 h-4 shrink-0 mt-0.5"></i>
+                  <div>
+                    <strong class="text-[#ffffff] block mb-0.5 uppercase tracking-wide text-[9px] font-sans">Corrective Action</strong>
+                    <span x-text="issue.action"></span>
+                  </div>
+                </div>
+                <div>
+                  <strong class="text-[#ffffff] block mb-0.5 uppercase tracking-wide text-[9px] font-sans">Root Cause Details</strong>
+                  <p x-text="issue.detail"></p>
+                </div>
+              </div>
+            </div>
+          </template>
+
+          <!-- No results screen -->
+          <div x-show="filteredIssues.length === 0" class="text-center py-16 bg-slate-900/50 border border-slate-800 rounded-xl space-y-3" x-cloak>
+            <div class="w-12 h-12 rounded-full bg-slate-950 border border-slate-800 flex items-center justify-center mx-auto text-[#94a3b8]">
+              <i data-lucide="search" class="w-6 h-6"></i>
+            </div>
+            <p class="text-xs text-[#94a3b8] font-medium font-sans">No diagnostic fixes match your search queries.</p>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+  </main>
+
+  <!-- JURASSIC PARK NEDRY JOKE DIALOG OVERLAY (Iframe Embed) -->
+  <div x-show="showNedryJoke" class="fixed inset-0 z-50 flex flex-col items-center justify-center bg-black/95 p-4 font-sans crt-scanlines" x-transition x-cloak>
+    <div class="max-w-2xl w-full bg-slate-950 border-4 border-red-600 rounded-3xl overflow-hidden shadow-[0_0_50px_rgba(220,38,38,0.4)] flex flex-col">
+      <!-- Header banner -->
+      <div class="bg-red-750 text-white py-3 px-4 font-black tracking-widest text-xs uppercase animate-pulse border-b border-red-600 text-center flex items-center justify-center gap-2">
+        <span>🚨 WARNING: AUTOMATED OVERRIDE TRIGGERED 🚨</span>
+      </div>
+      
+      <!-- Interactive Iframe container -->
+      <div class="bg-black flex items-center justify-center p-2 relative min-h-[460px]">
+        <template x-if="showNedryJoke">
+          <iframe src="file:///C:/Users/cj2sm/Downloads/nedry-master/nedry-master/index.html" 
+                  class="w-full h-[450px] border-0 rounded-2xl bg-black" 
+                  allow="autoplay"></iframe>
+        </template>
+      </div>
+
+      <!-- Footer navigation -->
+      <div class="p-4 border-t border-slate-900 bg-slate-950 flex flex-col gap-2">
+        <p class="text-[10px] text-slate-500 text-center font-mono uppercase">Dennis Nedry System Control Terminal v1.0</p>
+        <button @click="showNedryJoke = false" 
+                class="w-full py-3 bg-red-600 hover:bg-red-500 text-white font-extrabold text-xs rounded-xl transition cursor-pointer shadow-lg hover:shadow-[0_0_15px_rgba(220,38,38,0.4)]">
+          [x] Abort Auto-Setup & Return to Step 5
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- IMAGE REFERENCE MODAL DIALOG -->
+  <div x-show="showImageModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm" x-transition x-cloak>
+    <div @click.outside="showImageModal = false" class="bg-slate-950 border border-slate-800 rounded-2xl max-w-2xl w-full overflow-hidden shadow-2xl flex flex-col">
+      <div class="px-5 py-4 border-b border-slate-800/80 flex justify-between items-center bg-slate-900/50 font-sans">
+        <h3 class="text-sm font-bold text-[#ffffff] flex items-center gap-2">
+          <i data-lucide="camera" class="w-4.5 h-4.5" :class="activeTheme === 'cyber' ? 'text-[#00f0ff] glow-cyan' : (activeTheme === 'amber' ? 'text-[#d97757] glow-orange' : 'text-[#10b981] glow-green')"></i> Reference Screen: <span x-text="modalImageTitle"></span>
+        </h3>
+        <button @click="showImageModal = false" class="text-[#94a3b8] hover:text-[#f8fafc] transition cursor-pointer font-bold">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+      <div class="p-6 flex flex-col items-center gap-4 bg-slate-950">
+        <img :src="modalImageUrl" class="max-w-full max-h-[55vh] rounded-lg border border-slate-800 shadow-lg object-contain" />
+        <p class="text-xs font-serif text-[#94a3b8] text-center px-4 leading-relaxed" x-text="modalImageDesc"></p>
+      </div>
+      <div class="px-5 py-3.5 border-t border-slate-800 bg-slate-900/50 text-right font-sans">
+        <button @click="showImageModal = false" class="px-4 py-1.5 font-bold text-xs rounded-lg transition cursor-pointer"
+                :class="activeTheme === 'cyber' ? 'bg-[#00f0ff] text-[#080c14] glow-cyan' : (activeTheme === 'amber' ? 'bg-[#d97757] text-[#141413] glow-orange' : 'bg-[#10b981] text-white glow-green')">
+          Close Reference Screen
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- FOOTER -->
+  <footer class="border-t bg-opacity-80 text-center py-8 text-[11px] text-[#94a3b8] space-y-1 font-serif"
+          :class="activeTheme === 'cyber' ? 'border-slate-800 bg-[#080c14]' : (activeTheme === 'amber' ? 'border-[#e8e6dc]/10 bg-[#141413]' : 'border-emerald-950 bg-[#04080f]')">
+    <p>Constructed specifically for standard Roland V-160HD Broadcast and Live Event Workflows.</p>
+    <p class="mt-1">Keep checking off tasks sequentially before introducing live video feeds.</p>
+  </footer>
+
+  <script>
+    function companionApp() {
+      // Dynamic simulated signal VU levels loop
+      let vuInterval = null;
+
+      return {
+        // Mode state (Simple Guide vs Expert Panel)
+        expertMode: false,
+
+        // Active Theme state ('cyber' / 'amber' / 'green')
+        activeTheme: 'cyber',
+
+        // Active visual tab (only applicable when expertMode is active)
+        activeTab: 'patchbay',
+
+        // Wizard Step state (Simple mode)
+        wizardStep: 1,
+
+        // Audio Selected Option in Step 4 ('hdmi' / 'di')
+        audioOption: null,
+
+        // Nedry Jurassic Park joke overlay toggle
+        showNedryJoke: false,
+
+        // Global hardware toggles
+        config: {
+          centerProj: false,
+          dviMonitor: false,
+          producerDA: false
+        },
+
+        // Selected input in rear-panel inspector
+        selectedInputData: null,
+
+        // active connection simulated status
+        activeConnection: true,
+
+        // Switcher cross points
+        pgmCrossPoint: 1,
+        pstCrossPoint: 2,
+
+        // Tally config settings
+        tallyInput: 1,
+
+        // Diagnostic Search
+        searchQuery: '',
+        activeFilter: 'all',
+
+        // Reference Image Modal States
+        showImageModal: false,
+        modalImageUrl: '',
+        modalImageTitle: '',
+        modalImageDesc: '',
+
+        // Faders setup
+        faders: [
+          { id: 'mic1', name: 'Mic 1 (XLR)', level: 0, muted: true, baseVU: 0 },
+          { id: 'mic2', name: 'Mic 2 (XLR)', level: 0, muted: true, baseVU: 0 },
+          { id: 'rca', name: 'Line (RCA)', level: 0, muted: true, baseVU: 0 },
+          { id: 'hdmi', name: 'HDMI In (PC)', level: 80, muted: false, baseVU: 65 },
+          { id: 'usb', name: 'USB-C (PC)', level: 0, muted: true, baseVU: 0 },
+          { id: 'master', name: 'Master Out', level: 75, muted: false, baseVU: 70 }
+        ],
+
+        // Input connectors initial values
+        inputs: [
+          { id: 1, num: 1, type: 'HDMI', label: 'Presentation Laptop', format: '1920x1080 @ 60.00p', sourceType: 'Client Laptop', connected: false },
+          { id: 2, num: 2, type: 'HDMI', label: 'Cam 2 (Right)', format: '1920x1080 @ 59.94p', sourceType: 'PTZ Camera', connected: true },
+          { id: 3, num: 3, type: 'HDMI', label: 'Backup PC', format: '1920x1080 @ 60.00p', sourceType: 'Client Laptop', connected: true },
+          { id: 4, num: 4, type: 'HDMI', label: 'Gfx Laptop', format: '1920x1080 @ 60.00p', sourceType: 'Client Laptop', connected: true },
+          { id: 5, num: 5, type: 'HDMI', label: 'Playback Pro', format: '1920x1080 @ 59.94p', sourceType: 'Playpack / Video', connected: true },
+          { id: 6, num: 6, type: 'HDMI', label: 'Unused 6', format: '1920x1080 @ 59.94p', sourceType: 'None', connected: false },
+          { id: 7, num: 7, type: 'HDMI', label: 'Unused 7', format: '1920x1080 @ 59.94p', sourceType: 'None', connected: false },
+          { id: 8, num: 8, type: 'HDMI', label: 'Unused 8', format: '1920x1080 @ 59.94p', sourceType: 'None', connected: false },
+          { id: 9, num: 1, type: 'SDI', label: 'Camera 3', format: '1920x1080 @ 59.94i', sourceType: 'PTZ Camera', connected: true },
+          { id: 10, num: 2, type: 'SDI', label: 'Camera 4', format: '1920x1080 @ 59.94i', sourceType: 'PTZ Camera', connected: true },
+          { id: 11, num: 3, type: 'SDI', label: 'Stage PTZ', format: '1920x1080 @ 59.94i', sourceType: 'PTZ Camera', connected: true },
+          { id: 12, num: 4, type: 'SDI', label: 'Media Server', format: '1920x1080 @ 59.94p', sourceType: 'Media Server', connected: true },
+          { id: 13, num: 5, type: 'SDI', label: 'DSM Feedback', format: '1920x1080 @ 59.94p', sourceType: 'PTZ Camera', connected: true },
+          { id: 14, num: 6, type: 'SDI', label: 'Unused SDI 6', format: '1920x1080 @ 59.94p', sourceType: 'None', connected: false },
+          { id: 15, num: 7, type: 'SDI', label: 'Unused SDI 7', format: '1920x1080 @ 59.94p', sourceType: 'None', connected: false },
+          { id: 16, num: 8, type: 'SDI', label: 'Unused SDI 8', format: '1920x1080 @ 59.94p', sourceType: 'None', connected: false }
+        ],
+
+        // Startup checklist steps
+        phases: [
+          {
+            title: "Phase 1: Pure System Cleansing",
+            steps: [
+              {
+                label: "Execute Factory Reset Baseline",
+                menu: "[MENU] -> SYSTEM -> FACTORY RESET",
+                desc: "Wipe all host venue configuration residuals, network IP locks, or corrupt EDID setups.",
+                completed: false,
+                image: './1623725145_IMG_1550674.jpg',
+                imageDesc: 'Navigate to [SYSTEM] using the physical menu knob. Select [FACTORY RESET] at the bottom of the list. Choose [YES] in the confirmation dialog that pops up next.'
+              },
+              {
+                label: "Wipe Out Preset Memories",
+                menu: "[MENU] -> PRESET MEMORY -> INITIALIZE",
+                desc: "Delete default Scene Slots 1-30 completely to prevent dangerous layout callbacks.",
+                completed: false,
+                image: './1623725145_IMG_1550676.jpg',
+                imageDesc: 'Navigate to [PRESET MEMORY] and select [INITIALIZE] to purge all preset layout memory slots.'
+              },
+              {
+                label: "Wipe System Macro Scripts",
+                menu: "[MENU] -> SYSTEM -> MACRO -> INITIALIZE",
+                desc: "Delete system macros 1-100 to prevent automated multi-view triggers from previous operators.",
+                completed: false,
+                image: './1623725145_IMG_1550677.jpg',
+                imageDesc: 'Navigate to [SYSTEM] -> [MACRO] and click [INITIALIZE] to wipe all automated operation macros.'
+              }
+            ]
+          },
+          {
+            title: "Phase 2: Video Architecture & Color Space",
+            steps: [
+              {
+                label: "Establish Program Routing Rules",
+                menu: "[MENU] -> VIDEO OUTPUT -> ROUTE",
+                desc: "Map SDI OUT 1-3 and HDMI OUT 1-2 to the primary Program (PGM) Bus as fallback.",
+                completed: false,
+                image: './1664818253_IMG_1851945.webp',
+                imageDesc: 'Configure VIDEO OUT matrices. Make sure HDMI OUT 1 & 2 are mapped to the primary PGM (Program) bus, as displayed on the screen assign menu.'
+              },
+              {
+                label: "Dedicate local Monitor to HDMI Out 3",
+                menu: "[MENU] -> VIDEO OUTPUT -> HDMI OUT 3",
+                desc: "Ensure Output 3 is allocated specifically for local Multi-View tracking.",
+                completed: false,
+                image: './1623725145_IMG_1550678.jpg',
+                imageDesc: 'In the Output Assign screen, ensure [HDMI OUT 3] is routed to [AUX] or the local MULTI-VIEW bus.'
+              },
+              {
+                label: "Force DVI RGB Space (Conditional)",
+                menu: "HDMI OUT 3 -> COLOR SPACE",
+                desc: "For your older DVI-D monitors, change the color space directly to RGB (0 to 255) to fix purple tint issues.",
+                completed: false,
+                requires: "dviMonitor",
+                image: './1623725145_IMG_1550679.jpg',
+                imageDesc: 'Go to HDMI OUT 3 settings and set the [OUTPUT COLOR SPACE] directly to [RGB] to bypass purple tint handshake issues.'
+              },
+              {
+                label: "Interpose Converter Units for long HDMI lines",
+                menu: "CONVERTER BENCH",
+                desc: "For target displays over 100 feet away using HDMI Out 1 or 2, patch through a Decimator converter to convert output signal to SDI.",
+                completed: false
+              },
+              {
+                label: "Patch Projector Left and Right",
+                menu: "SDI OUT 1 & 2 PHYSICAL PATCH",
+                desc: "Run direct physical SDI lines from physical Out 1 to Left Projector, Out 2 to Right Projector.",
+                completed: false
+              },
+              {
+                label: "Patch Center Projector / DSM (Conditional)",
+                menu: "SDI OUT 3 PHYSICAL PATCH",
+                desc: "Route SDI Out 3 to your Center Projector or your Downstage Floor Monitor (DSM).",
+                completed: false,
+                requires: "centerProj",
+                image: './1664818253_IMG_1851946.webp',
+                imageDesc: 'Under SDI Output Assign settings, ensure SDI OUT 3 is routed to PGM to feed the Downstage Floor Monitor or Center Projector.'
+              },
+              {
+                label: "Interpose Converter Units for long HDMI lines",
+                menu: "CONVERTER BENCH",
+                desc: "For target displays over 100 feet away using HDMI Out 1 or 2, patch through a Decimator converter to convert output signal to SDI.",
+                completed: false
+              }
+            ]
+          },
+          {
+            title: "Phase 3: Tactical Audio Gain-Staging",
+            steps: [
+              {
+                label: "Mute Unused Analog XLR & RCA inputs",
+                menu: "[MENU] -> AUDIO INPUT -> IN 1, 2, 3/4",
+                desc: "Hard mute unused physical analog ports to stop line buzz or FOH white noise.",
+                completed: false,
+                image: './1623725145_IMG_1550680.jpg',
+                imageDesc: 'Open [AUDIO INPUT] settings. Verify analog Mic 1 or RCA sensitivities are muted when unused to eliminate pre-amp white noise.'
+              },
+              {
+                label: "Provision Laptop Sources (Keep Unmuted)",
+                menu: "[MENU] -> AUDIO INPUT -> HDMI IN",
+                desc: "Keep digital HDMI/SDI ports open. Ensure client PCs and media laptops are unmuted on the mixer.",
+                completed: false
+              },
+              {
+                label: "Protect Auxiliary Busses (Mute Loop Danger)",
+                menu: "[MENU] -> AUDIO OUTPUT -> AUX 1-3",
+                desc: "Mute unused Aux lines and USB-C output to stop self-feeding feedback loops.",
+                completed: false
+              },
+              {
+                label: "Set Master Fader Output to Unity (0.0 dB)",
+                menu: "MASTER KNOB (TOP PANEL)",
+                desc: "Turn Master knob on the physical board to 0.0 dB to align output level linearities.",
+                completed: false
+              },
+              {
+                label: "Engage Headroom Trim on Playback Laptops",
+                menu: "CLIENT HARDWARE TIGHTENING",
+                desc: "Force host computers/laptops to exactly 40% master system volume. Playbacks are hot and will clip if set to 100%.",
+                completed: false
+              },
+              {
+                label: "Configure AFV (Audio Follow Video) Safely",
+                menu: "[MENU] -> AUDIO FOLLOW -> CHANNEL-BY-CHANNEL",
+                desc: "Enable AFV ONLY for video playback lines. Keep AFV OFF for cameras to protect against mic spikes.",
+                tip: "<strong>Safety First:</strong> Global AFV is a hazard. Enabling it selectively prevents camera mic bumps from being heard during switches.",
+                completed: false
+              }
+            ]
+          },
+          {
+            title: "Phase 4: Network & Smart Tally Check",
+            steps: [
+              {
+                label: "Set Router LAN Connectivity",
+                menu: "PHYSICAL ETHERNET PATCH",
+                desc: "Run Cat6 cable from your router/switch directly to V-160HD's LAN CONTROL port.",
+                completed: false
+              },
+              {
+                label: "Obtain IP Address via DHCP",
+                menu: "[MENU] -> LAN CONTROL -> DHCP",
+                desc: "Confirm switcher obtains a conflict-free IP address from the network.",
+                completed: false,
+                image: './1623725145_IMG_1550681.jpg',
+                imageDesc: 'Go to [SYSTEM] -> [LAN CONTROL] and set DHCP to ON. Verify that the switcher successfully receives a dynamic IP address.'
+              },
+              {
+                label: "Initiate iPad / Tablet Remote Apps",
+                menu: "[MENU] -> LAN CONTROL -> NETWORK PASSWORD",
+                desc: "Connect your control device to Wi-Fi, run the V-160HD utility, and key in your 4-digit code.",
+                completed: false,
+                image: './1623725153_1646815.jpg',
+                imageDesc: 'Navigate to [SYSTEM] -> [Smart Tally] or LAN Control to verify security passcodes and Tally parameters.'
+              }
+            ]
+          }
+        ],
+
+        // Diagnostics catalog
+        issues: [
+          {
+            tag: 'video',
+            title: "Purple/Pink Tint on Multi-View",
+            action: "Force HDMI OUT 3 to RGB Color Space",
+            detail: "This happens when older DVI-D computer monitors fail to process HDMI's YPbPr color standard. Force the V-160HD's HDMI 3 Color Space output directly to RGB (0-255) to restore crisp grey and black color channels."
+          },
+          {
+            tag: 'audio',
+            title: "Computer Audio Clipping or Distorting",
+            action: "Scale Playback OS Volume to 40%",
+            detail: "Computers deliver very loud digital audio signals. By keeping physical/virtual faders around unity and reducing the source laptop's internal system volume slider to 40%, you protect the pre-amps from digital clipping."
+          },
+          {
+            tag: 'video',
+            title: "Flickering Screen or Dropouts over HDMI",
+            action: "Convert to SDI via Decimator MD-LX",
+            detail: "HDMI signals struggle to stay stable past 30 feet, and rarely survive 100 feet. Patch through a Decimator or similar converter at both the switcher end and the projector end to convert the signal to SDI for reliable runs up to 300 feet."
+          },
+          {
+            tag: 'audio',
+            title: "Audio Feedback or Constant Hiss",
+            action: "Hard Mute Unused Analog Inputs & AUXs",
+            detail: "Unplugged XLR lines on a board acts as antennas, picking up electronic hums and interference. Muting all unused analog inputs and closing down unused AUX channels guarantees clean output lines."
+          },
+          {
+            tag: 'network',
+            title: "iPad Remote App Disconnects / Fails to Sync",
+            action: "Force Static Router DHCP Binding",
+            detail: "V-160HD remote apps can lose pairing if the host router shifts the IP leases mid-show. Allocate a static reservation in the router dashboard mapped to the Roland MAC address."
+          },
+          {
+            tag: 'video',
+            title: "HDCP Blocked Content (Black Screen on Inputs)",
+            action: "Disable HDCP Input Keying",
+            detail: "By default, the V-160HD blocks inputs containing HDCP handshake triggers (e.g. from Macs or Blu-Ray players). Navigate to [MENU] -> SYSTEM -> HDCP and set it to OFF to force conversion."
+          }
+        ],
+
+        // Initialize Lucide icons on Alpine loading
+        init() {
+          this.$nextTick(() => {
+            lucide.createIcons();
+            this.startVUMeters();
+          });
+          this.loadState();
+        },
+
+        // Save progress to local storage
+        saveState() {
+          localStorage.setItem('v160_companion_config', JSON.stringify(this.config));
+          localStorage.setItem('v160_companion_inputs', JSON.stringify(this.inputs));
+          localStorage.setItem('v160_companion_faders', JSON.stringify(this.faders));
+          localStorage.setItem('v160_companion_theme', this.activeTheme);
+          localStorage.setItem('v160_companion_audio_opt', this.audioOption || '');
+          localStorage.setItem('v160_companion_tally', JSON.stringify({
+            pgm: this.pgmCrossPoint,
+            pst: this.pstCrossPoint,
+            tally: this.tallyInput
+          }));
+        },
+
+        // Fetch saved configuration
+        loadState() {
+          const savedConfig = localStorage.getItem('v160_companion_config');
+          const savedInputs = localStorage.getItem('v160_companion_inputs');
+          const savedFaders = localStorage.getItem('v160_companion_faders');
+          const savedTally = localStorage.getItem('v160_companion_tally');
+          const savedTheme = localStorage.getItem('v160_companion_theme');
+          const savedAudioOpt = localStorage.getItem('v160_companion_audio_opt');
+
+          // Always reset Wizard/Checklist state on new loads
+          this.expertMode = false;
+          this.wizardStep = 1;
+          this.phases.forEach(phase => {
+            phase.steps.forEach(step => step.completed = false);
+          });
+
+          if (savedConfig) this.config = JSON.parse(savedConfig);
+          if (savedInputs) {
+            this.inputs = JSON.parse(savedInputs);
+            // Ensure inputs[0].label remains 'Presentation Laptop'
+            if (this.inputs[0]) {
+              this.inputs[0].label = 'Presentation Laptop';
+              // Keep default connection state false on fresh loads
+              if (localStorage.getItem('v160_companion_inputs') === null) {
+                this.inputs[0].connected = false;
+              }
+            }
+          }
+          if (savedFaders) this.faders = JSON.parse(savedFaders);
+          if (savedTheme) this.activeTheme = savedTheme;
+          if (savedAudioOpt) this.audioOption = savedAudioOpt;
+          if (savedTally) {
+            const data = JSON.parse(savedTally);
+            this.pgmCrossPoint = data.pgm;
+            this.pstCrossPoint = data.pst;
+            this.tallyInput = data.tally;
+          }
+        },
+
+        // Reset Inputs to defaults
+        resetInputs() {
+          localStorage.removeItem('v160_companion_inputs');
+          window.location.reload();
+        },
+
+        // Wipe all checklist state values
+        resetChecklist() {
+          this.phases.forEach(phase => {
+            phase.steps.forEach(step => step.completed = false);
+          });
+          this.saveState();
+        },
+
+        checkAllChecklist() {
+          this.phases.forEach(phase => {
+            phase.steps.forEach(step => {
+              if (this.isStepVisible(step)) step.completed = true;
+            });
+          });
+          this.saveState();
+        },
+
+        // Open image modal
+        openImage(url, title, desc) {
+          this.modalImageUrl = url;
+          this.modalImageTitle = title;
+          this.modalImageDesc = desc;
+          this.showImageModal = true;
+          this.$nextTick(() => lucide.createIcons());
+        },
+
+        // Dynamic VU level animation loop (Simulated signal bouncing)
+        startVUMeters() {
+          if (vuInterval) clearInterval(vuInterval);
+          vuInterval = setInterval(() => {
+            this.faders.forEach(fader => {
+              if (fader.muted || fader.level === 0) {
+                fader.baseVU = 0;
+              } else {
+                // Generate small random bouncing values based on current fader position
+                const variation = (Math.random() - 0.5) * 12;
+                let targetVU = fader.level + variation;
+                if (targetVU < 0) targetVU = 0;
+                if (targetVU > 100) targetVU = 100;
+                fader.baseVU = Math.round(targetVU);
+              }
+            });
+          }, 120);
+        },
+
+        // Dragging audio Optimize levels preset
+        optimizeAudioLevels() {
+          this.faders.forEach(fader => {
+            if (fader.id === 'hdmi') {
+              fader.level = 80;
+              fader.muted = false;
+            } else if (fader.id === 'master') {
+              fader.level = 75; // Unity (0.0dB)
+              fader.muted = false;
+            } else if (fader.id === 'mic1' || fader.id === 'mic2' || fader.id === 'rca' || fader.id === 'usb') {
+              fader.level = 0;
+              fader.muted = true;
+            }
+          });
+          this.saveState();
+        },
+
+        toggleMute(fader) {
+          fader.muted = !fader.muted;
+          this.saveState();
+        },
+
+        getFaderLevelText(level) {
+          if (level === 0) return 'MUTE';
+          if (level === 75) return '0.0 dB (U)';
+          // Translate 0-100 range to dynamic dB readings (-40dB to +6dB)
+          const dbVal = ((level / 100) * 46) - 40;
+          return `${dbVal > 0 ? '+' : ''}${dbVal.toFixed(1)} dB`;
+        },
+
+        getVUHeight(fader) {
+          if (fader.muted) return 0;
+          return fader.baseVU;
+        },
+
+        getVUClass(fader) {
+          if (fader.muted) return 'bg-slate-800/60';
+          if (fader.baseVU > 85) return 'bg-[#ff3366] glow-pgm';
+          if (fader.baseVU > 70) return 'bg-[#ff3366]/80';
+          return this.activeTheme === 'cyber' ? 'bg-[#00f0ff]' : (this.activeTheme === 'amber' ? 'bg-[#d97757]' : 'bg-[#10b981]');
+        },
+
+        isVUClip(fader) {
+          return !fader.muted && fader.baseVU > 90;
+        },
+
+        // Stepper Navigation functions (Guided Setup Wizard)
+        getWizardStepName() {
+          if (this.wizardStep === 1) return 'System Cleansing';
+          if (this.wizardStep === 2) return 'Plug in Laptop';
+          if (this.wizardStep === 3) return 'Route to Screens';
+          if (this.wizardStep === 4) return 'Select PC Audio';
+          return 'Troubleshooting';
+        },
+
+        nextWizardStep() {
+          if (this.wizardStep < 5) {
+            this.wizardStep++;
+            this.$nextTick(() => lucide.createIcons());
+          }
+        },
+
+        prevWizardStep() {
+          if (this.wizardStep > 1) {
+            this.wizardStep--;
+            this.$nextTick(() => lucide.createIcons());
+          }
+        },
+
+        toggleStepComplete(phaseIdx, stepIdx) {
+          if (this.phases[phaseIdx] && this.phases[phaseIdx].steps[stepIdx]) {
+            this.phases[phaseIdx].steps[stepIdx].completed = !this.phases[phaseIdx].steps[stepIdx].completed;
+            this.saveState();
+          }
+        },
+
+        finishWizard() {
+          // Complete all standard setup phases checklist
+          this.checkAllChecklist();
+          // Switch tab to the full console
+          this.expertMode = true;
+          this.activeTab = 'patchbay';
+          this.saveState();
+        },
+
+        // Helper tracking variables
+        get totalSteps() {
+          let count = 0;
+          this.phases.forEach(phase => {
+            phase.steps.forEach(step => {
+              if (this.isStepVisible(step)) count++;
+            });
+          });
+          return count;
+        },
+
+        get completedSteps() {
+          let count = 0;
+          this.phases.forEach(phase => {
+            phase.steps.forEach(step => {
+              if (this.isStepVisible(step) && step.completed) count++;
+            });
+          });
+          return count;
+        },
+
+        get progressPercent() {
+          if (this.totalSteps === 0) return 0;
+          return Math.round((this.completedSteps / this.totalSteps) * 100);
+        },
+
+        getPhaseCompletedCount(phase) {
+          return phase.steps.filter(step => this.isStepVisible(step) && step.completed).length;
+        },
+
+        getPhaseTotalCount(phase) {
+          return phase.steps.filter(step => this.isStepVisible(step)).length;
+        },
+
+        isStepVisible(step) {
+          if (!step.requires) return true;
+          return this.config[step.requires] === true;
+        },
+
+        // Select Input for Sidebar inspector
+        selectInput(input) {
+          this.selectedInputData = input;
+        },
+
+        updateInputConnection(input) {
+          this.saveState();
+        },
+
+        getInputLEDClass(input) {
+          if (!input.connected) return 'bg-slate-800/60';
+          if (input.num === this.pgmCrossPoint && input.type === (input.num <= 4 ? 'HDMI' : 'SDI')) {
+            return 'bg-[#ff3366] glow-pgm animate-pulse';
+          }
+          if (input.num === this.pstCrossPoint && input.type === (input.num <= 4 ? 'HDMI' : 'SDI')) {
+            return this.activeTheme === 'cyber' ? 'bg-[#00f0ff] glow-pst' : (this.activeTheme === 'amber' ? 'bg-[#d97757] glow-orange' : 'bg-[#10b981] glow-green');
+          }
+          return this.activeTheme === 'cyber' ? 'bg-[#00f0ff]' : (this.activeTheme === 'amber' ? 'bg-[#d97757]' : 'bg-[#10b981]');
+        },
+
+        getInputButtonClass(input) {
+          // If selected in inspector
+          let base = 'bg-slate-900/40 border-slate-700/30 text-slate-400 hover:bg-slate-855 hover:text-slate-200 cursor-pointer';
+          if (this.selectedInputData?.id === input.id) {
+            base = `bg-slate-900 ring-1 cursor-pointer ${this.activeTheme === 'cyber' ? 'border-[#00f0ff]/60 ring-[#00f0ff]/30' : (this.activeTheme === 'amber' ? 'border-[#d97757]/60 ring-[#d97757]/30' : 'border-[#10b981]/60 ring-[#10b981]/30')}`;
+          }
+          
+          if (input.num === this.pgmCrossPoint && input.type === (input.num <= 4 ? 'HDMI' : 'SDI')) {
+            base = 'bg-red-500/20 border-red-500 text-red-400 cursor-pointer';
+          } else if (input.num === this.pstCrossPoint && input.type === (input.num <= 4 ? 'HDMI' : 'SDI')) {
+            base = `cursor-pointer ${this.activeTheme === 'cyber' ? 'bg-[#00f0ff]/20 border-[#00f0ff] text-[#00f0ff]' : (this.activeTheme === 'amber' ? 'bg-[#d97757]/20 border-[#d97757] text-[#d97757]' : 'bg-[#10b981]/20 border-[#10b981] text-[#10b981]')}`;
+          }
+          
+          if (!input.connected) {
+            base += ' opacity-40';
+          }
+          return base;
+        },
+
+        getSignalBadgeClass(input) {
+          if (input.num === this.pgmCrossPoint && input.type === (input.num <= 4 ? 'HDMI' : 'SDI')) {
+            return 'bg-red-500/20 border border-red-500/40 text-red-400 glow-pgm';
+          }
+          if (input.num === this.pstCrossPoint && input.type === (input.num <= 4 ? 'HDMI' : 'SDI')) {
+            return `border ${this.activeTheme === 'cyber' ? 'bg-[#00f0ff]/20 border-[#00f0ff]/40 text-[#00f0ff] glow-pst' : (this.activeTheme === 'amber' ? 'bg-[#d97757]/20 border-[#d97757]/40 text-[#d97757] glow-orange' : 'bg-[#10b981]/20 border-[#10b981]/40 text-[#10b981] glow-green')}`;
+          }
+          return 'bg-slate-955 border border-slate-800 text-[#94a3b8]';
+        },
+
+        getSignalBadgeText(input) {
+          if (input.num === this.pgmCrossPoint && input.type === (input.num <= 4 ? 'HDMI' : 'SDI')) {
+            return 'PGM ON-AIR';
+          }
+          if (input.num === this.pstCrossPoint && input.type === (input.num <= 4 ? 'HDMI' : 'SDI')) {
+            return 'PST PREVIEW';
+          }
+          return 'STANDBY';
+        },
+
+        // Switcher logic
+        selectPGM(num) {
+          this.pgmCrossPoint = num;
+          this.saveState();
+        },
+
+        selectPST(num) {
+          this.pstCrossPoint = num;
+          this.saveState();
+        },
+
+        // Smart Tally State logic
+        getTallyState() {
+          // Identify if the assigned input is active on PGM or PST
+          // Inputs 1-4 are HDMI, 5-8 are SDI (mapped internally)
+          const targetInput = this.inputs.find(i => i.num == this.tallyInput);
+          if (!targetInput || !targetInput.connected) return 'OFF';
+          
+          if (targetInput.num === this.pgmCrossPoint && targetInput.type === (targetInput.num <= 4 ? 'HDMI' : 'SDI')) {
+            return 'PGM';
+          }
+          if (targetInput.num === this.pstCrossPoint && targetInput.type === (targetInput.num <= 4 ? 'HDMI' : 'SDI')) {
+            return 'PST';
+          }
+          return 'OFF';
+        },
+
+        getTallyMonitorClass() {
+          const state = this.getTallyState();
+          if (state === 'PGM') return 'bg-red-500/20 border border-red-500/40 text-red-400 glow-pgm';
+          if (state === 'PST') return `border ${this.activeTheme === 'cyber' ? 'bg-[#00f0ff]/20 border-[#00f0ff]/40 text-[#00f0ff] glow-pst' : (this.activeTheme === 'amber' ? 'bg-[#d97757]/20 border-[#d97757]/40 text-[#d97757] glow-orange' : 'bg-[#10b981]/20 border-[#10b981]/40 text-[#10b981] glow-green')}`;
+          return 'bg-slate-900/50 border border-slate-800 text-[#94a3b8]';
+        },
+
+        getTallyStateText() {
+          const state = this.getTallyState();
+          if (state === 'PGM') return 'LIVE (PGM)';
+          if (state === 'PST') return 'PREVIEW';
+          return 'STANDBY';
+        },
+
+        getTallyIcon() {
+          const state = this.getTallyState();
+          if (state === 'PGM') return 'video';
+          if (state === 'PST') return 'eye';
+          return 'video-off';
+        },
+
+        // Diagnostics filtering
+        get filteredIssues() {
+          let list = this.issues;
+          
+          // Filter by Tag
+          if (this.activeFilter !== 'all') {
+            list = list.filter(i => i.tag === this.activeFilter);
+          }
+          
+          // Filter by search Query
+          if (this.searchQuery.trim() !== '') {
+            const q = this.searchQuery.toLowerCase();
+            list = list.filter(i => 
+              i.title.toLowerCase().includes(q) || 
+              i.action.toLowerCase().includes(q) || 
+              i.detail.toLowerCase().includes(q)
+            );
+          }
+          
+          return list;
+        },
+
+        getIssueTagClass(tag) {
+          if (tag === 'video') return 'bg-blue-900/20 border border-blue-900/30 text-[#3b82f6] glow-cyan';
+          if (tag === 'audio') return 'bg-[#10b981]/15 border border-[#10b981]/30 text-[#10b981] glow-green';
+          return 'bg-[#ff3366]/10 border border-[#ff3366]/20 text-[#ff3366]';
+        }
+      }
+    }
+  </script>
+</body>
+</html>
