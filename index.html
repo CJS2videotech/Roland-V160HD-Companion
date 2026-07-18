@@ -299,7 +299,8 @@
               <i data-lucide="tv" :class="activeTheme === 'cyber' ? 'text-[#00f0ff]' : (activeTheme === 'amber' ? 'text-[#d97757]' : 'text-[#10b981]')"></i> 4. Route Laptop Screen to Projectors
             </h2>
             <p class="text-sm font-serif leading-relaxed" :class="activeTheme === 'cyber' ? 'text-[#94a3b8]' : (activeTheme === 'amber' ? 'text-[#b0aea5]' : 'text-slate-400')">
-              Route your presentation laptop to the screens. Click the PGM/PST buttons on the left switcher panel to watch the multi-view screens respond.
+              Route your presentation laptop to the screens. Click the PGM/PST buttons on the simulator below to watch the multi-view screens respond. 
+              On the physical switcher panel: pushing <strong>PROGRAM 1</strong> on the top row routes the laptop directly to the main program output screen, and pushing <strong>PRESET 1</strong> on the bottom row routes it to the preview screen in the multi-view monitor.
             </p>
           </div>
 
@@ -470,8 +471,6 @@
                 <div class="p-2 bg-slate-900 rounded border border-[#ff3366]/20 text-[#ff3366] font-mono text-[10px]">
                   Go to Expert Mode &rarr; [MENU] &rarr; VIDEO OUTPUT &rarr; HDMI OUT 3 &rarr; COLOR SPACE &rarr; RGB (0-255).
                 </div>
-                <img src="./assets/Roland Tally n Power.jpg" class="max-w-xs rounded border block mx-auto mt-2" 
-                     :class="activeTheme === 'cyber' ? 'border-slate-800' : (activeTheme === 'amber' ? 'border-[#e8e6dc]/10' : 'border-slate-850')" />
               </div>
             </div>
 
@@ -1457,8 +1456,8 @@
         },
 
         finishWizard() {
-          // Complete all standard setup phases checklist
-          this.checkAllChecklist();
+          // Keep checklist starting fresh/clear as requested
+          this.resetChecklist();
           // Switch tab to the full console
           this.expertMode = true;
           this.activeTab = 'checklist';
