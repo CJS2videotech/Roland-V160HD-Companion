@@ -195,13 +195,6 @@
               <div class="text-[11px] leading-relaxed border-t pt-2 mt-2" :class="activeTheme === 'cyber' ? 'border-slate-800 text-slate-400' : (activeTheme === 'amber' ? 'border-[#e8e6dc]/10 text-[#b0aea5]' : 'border-slate-855 text-slate-400')">
                 <strong>Rotary Knob Operation:</strong> Push the knob to select/enter a menu option, and push the knob again to exit the same menu option back to the list.
               </div>
-              <div class="flex justify-center pt-2">
-                <button @click="toggleStepComplete(0, 0)" 
-                        class="px-4 py-2 text-xs font-bold rounded-lg border transition duration-200 cursor-pointer shadow-md"
-                        :class="phases[0].steps[0].completed ? 'bg-[#10b981]/20 border-[#10b981] text-[#10b981] glow-green' : (activeTheme === 'cyber' ? 'bg-slate-900 border-slate-800 text-[#ffffff] hover:border-[#00f0ff]' : (activeTheme === 'amber' ? 'bg-[#141413] border-[#e8e6dc]/20 text-[#faf9f5] hover:border-[#d97757]' : 'bg-slate-900 border-slate-855 text-[#ffffff] hover:border-[#10b981]'))">
-                  <span x-text="phases[0].steps[0].completed ? '✓ Completed' : 'Mark Reset Done'"></span>
-                </button>
-              </div>
             </div>
             <div class="space-y-1">
               <span class="text-[10px] font-bold block uppercase font-sans" :class="activeTheme === 'cyber' ? 'text-[#94a3b8]' : (activeTheme === 'amber' ? 'text-[#b0aea5]' : 'text-slate-500')">SCREEN GUIDE REFERENCE:</span>
@@ -229,13 +222,6 @@
               <p class="text-xs leading-relaxed" :class="activeTheme === 'cyber' ? 'text-[#94a3b8]' : (activeTheme === 'amber' ? 'text-[#b0aea5]' : 'text-slate-400')">
                 Ensure HDMI OUT 3 is routed to the Multi-View bus so you can monitor all cameras, playbacks, and program feeds on a single screen.
               </p>
-              <div class="flex justify-center pt-2">
-                <button @click="toggleStepComplete(1, 1)" 
-                        class="px-4 py-2 text-xs font-bold rounded-lg border transition duration-200 cursor-pointer shadow-md"
-                        :class="phases[1].steps[1].completed ? 'bg-[#10b981]/20 border-[#10b981] text-[#10b981] glow-green' : (activeTheme === 'cyber' ? 'bg-slate-900 border-slate-800 text-[#ffffff] hover:border-[#00f0ff]' : (activeTheme === 'amber' ? 'bg-[#141413] border-[#e8e6dc]/20 text-[#faf9f5] hover:border-[#d97757]' : 'bg-slate-900 border-slate-855 text-[#ffffff] hover:border-[#10b981]'))">
-                  <span x-text="phases[1].steps[1].completed ? '✓ Completed' : 'Mark Monitor Connected'"></span>
-                </button>
-              </div>
             </div>
             <div class="space-y-1">
               <span class="text-[10px] font-bold block uppercase font-sans text-slate-500">SWITCHER REAR PANEL (HDMI OUT 3):</span>
