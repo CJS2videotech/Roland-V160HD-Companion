@@ -627,6 +627,7 @@
                   <p>1. Make sure your laptop is securely connected to physical <strong>HDMI Input 1</strong> on the switcher.</p>
                   <p>2. Verify the laptop signal status shows <strong>Connected</strong> (Step 3 check).</p>
                   <p>3. Tap <strong>PGM 1</strong> (Step 4 check) to make the laptop feed live on the program bus.</p>
+                  <p>4. Make sure that you are connected to the correct output. By default, output <strong>SDI-1</strong> is routed to program out.</p>
                 </div>
                 <div class="pt-2.5 border-t border-slate-200 dark:border-slate-800">
                   <span class="text-[10px] font-bold block uppercase font-sans mb-1.5" :class="activeTheme === 'light' ? 'text-slate-500' : 'text-[#94a3b8]'">Visual Reference Gallery (Click to enlarge):</span>
@@ -651,6 +652,14 @@
                          :class="activeTheme === 'light' ? 'border-slate-200' : 'border-slate-800'"
                          @click="modalImageUrl = './assets/Roland Tbar Auto Cut Buttons Closeup.jpg'; modalImageTitle = 'Output Fade Button'; modalImageDesc = 'Check the [OUTPUT FADE] button. If it is glowing solid red, the output is blacked out. Press it once to turn it off.'; showImageModal = true">
                       <img src="./assets/Roland Tbar Auto Cut Buttons Closeup.jpg" class="w-full h-full object-cover group-hover:scale-105 transition" />
+                      <div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 flex items-center justify-center transition">
+                        <i data-lucide="zoom-in" class="w-3.5 h-3.5 text-white"></i>
+                      </div>
+                    </div>
+                    <div class="group relative rounded border overflow-hidden bg-slate-950 flex items-center justify-center cursor-pointer h-14 w-20"
+                         :class="activeTheme === 'light' ? 'border-slate-200' : 'border-slate-800'"
+                         @click="modalImageUrl = './assets/In Out closeup.jpg'; modalImageTitle = 'Rear Inputs & Outputs'; modalImageDesc = 'Make sure that you are connected to the correct output. By default, output SDI-1 is routed to program out.'; showImageModal = true">
+                      <img src="./assets/In Out closeup.jpg" class="w-full h-full object-cover group-hover:scale-105 transition" />
                       <div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 flex items-center justify-center transition">
                         <i data-lucide="zoom-in" class="w-3.5 h-3.5 text-white"></i>
                       </div>
