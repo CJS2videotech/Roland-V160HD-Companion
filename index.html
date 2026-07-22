@@ -172,8 +172,8 @@
             <span class="text-[10px] font-bold block uppercase font-sans text-center" :class="activeTheme === 'light' ? 'text-slate-500' : 'text-[#94a3b8]'">Switcher Panel Overview:</span>
             <div class="rounded-xl border overflow-hidden bg-slate-950 flex items-center justify-center cursor-pointer max-w-md mx-auto shadow-inner"
                  :class="activeTheme === 'light' ? 'border-slate-200 shadow-sm bg-white' : 'border-slate-800'"
-                 @click="modalImageUrl = './assets/1. Roland Menu Exit Enter Knob Closeup.jpg'; modalImageTitle = 'Menu Navigation & Value Controls'; modalImageDesc = 'The push-rotary encoder knobs and menu control buttons. Push to select or enter a menu option, rotate to browse or select parameters.'; showImageModal = true">
-              <img src="./assets/1. Roland Menu Exit Enter Knob Closeup.jpg" class="w-full max-h-48 object-contain hover:scale-[1.02] transition duration-200 animate-fade-in" alt="Switcher Panel Overview" />
+                 @click="modalImageUrl = './assets/Switcher overview closeup.jpg'; modalImageTitle = 'Switcher Panel Overview'; modalImageDesc = 'Overall hardware layout of the Roland V-160HD control surface.'; showImageModal = true">
+              <img src="./assets/Switcher overview closeup.jpg" class="w-full max-h-48 object-contain hover:scale-[1.02] transition duration-200 animate-fade-in" alt="Switcher Panel Overview" />
             </div>
           </div>
 
@@ -190,8 +190,8 @@
                 </div>
                 <div class="rounded-lg overflow-hidden border bg-slate-950 min-h-[160px] flex items-center justify-center cursor-pointer"
                      :class="activeTheme === 'light' ? 'border-slate-200' : 'border-slate-800'"
-                     @click="modalImageUrl = './assets/Roland Tbar Auto Cut Buttons Closeup.jpg'; modalImageTitle = 'Output Fade Button Closeup'; modalImageDesc = 'Located in the sequence/transition section on the far right (Button 22). If Output Fade is ON, it glows red and blacks out the main program screens.'; showImageModal = true">
-                  <img src="./assets/Roland Tbar Auto Cut Buttons Closeup.jpg" class="w-full max-h-44 object-contain rounded-lg hover:scale-[1.02] transition duration-200" />
+                     @click="modalImageUrl = './assets/Output fade safety closeup.jpg'; modalImageTitle = 'Output Fade Button Closeup'; modalImageDesc = 'Located in the sequence/transition section on the far right (Button 22). If Output Fade is ON, it glows red and blacks out the main program screens.'; showImageModal = true">
+                  <img src="./assets/Output fade safety closeup.jpg" class="w-full max-h-44 object-contain rounded-lg hover:scale-[1.02] transition duration-200" />
                 </div>
                 <p class="text-xs font-serif leading-relaxed" :class="activeTheme === 'light' ? 'text-slate-600' : 'text-slate-400'">
                   If your projector screen is completely black, check this button immediately:
@@ -212,8 +212,8 @@
                 </div>
                 <div class="rounded-lg overflow-hidden border bg-slate-950 min-h-[160px] flex items-center justify-center cursor-pointer"
                      :class="activeTheme === 'light' ? 'border-slate-200' : 'border-slate-800'"
-                     @click="modalImageUrl = './assets/1. Roland Menu Exit Enter Knob Closeup.jpg'; modalImageTitle = 'Menu Controls Closeup'; modalImageDesc = 'Push-rotary encoder knob for menu controls. Turn to scroll parameters, push to enter/select, push menu/exit to back out.'; showImageModal = true">
-                  <img src="./assets/1. Roland Menu Exit Enter Knob Closeup.jpg" class="w-full max-h-44 object-contain rounded-lg hover:scale-[1.02] transition duration-200" />
+                     @click="modalImageUrl = './assets/Menu closeup.jpg'; modalImageTitle = 'Menu Controls Closeup'; modalImageDesc = 'Push-rotary encoder knob for menu controls. Turn to scroll parameters, push to enter/select, push menu/exit to back out.'; showImageModal = true">
+                  <img src="./assets/Menu closeup.jpg" class="w-full max-h-44 object-contain rounded-lg hover:scale-[1.02] transition duration-200" />
                 </div>
                 <p class="text-xs font-serif leading-relaxed" :class="activeTheme === 'light' ? 'text-slate-600' : 'text-slate-400'">
                   Use these controls to navigate configurations and execute the factory reset in Step 1:
@@ -262,8 +262,8 @@
                 </div>
                 <div class="rounded-lg overflow-hidden border bg-slate-950 min-h-[160px] flex items-center justify-center cursor-pointer"
                      :class="activeTheme === 'light' ? 'border-slate-200' : 'border-slate-800'"
-                     @click="modalImageUrl = './assets/3. Roland Outs Ins Closeup.jpg'; modalImageTitle = 'Rear Inputs & Outputs'; modalImageDesc = 'Back panel connectors for physical routing of camera and laptop feeds.'; showImageModal = true">
-                  <img src="./assets/3. Roland Outs Ins Closeup.jpg" class="w-full max-h-44 object-contain rounded-lg hover:scale-[1.02] transition duration-200" />
+                     @click="modalImageUrl = './assets/In Out closeup.jpg'; modalImageTitle = 'Rear Inputs & Outputs'; modalImageDesc = 'Back panel connectors for physical routing of camera and laptop feeds.'; showImageModal = true">
+                  <img src="./assets/In Out closeup.jpg" class="w-full max-h-44 object-contain rounded-lg hover:scale-[1.02] transition duration-200" />
                 </div>
                 <p class="text-xs font-serif leading-relaxed" :class="activeTheme === 'light' ? 'text-slate-600' : 'text-slate-400'">
                   Verify physical connections on the back of the Roland V-160HD:
@@ -297,6 +297,28 @@
               </div>
             </div>
 
+            <!-- Sequencer Safety Warning -->
+            <div class="p-4 rounded-xl border flex flex-col justify-between space-y-3"
+                 :class="activeTheme === 'light' ? 'bg-slate-50 border-slate-200' : 'bg-slate-950/80 border-emerald-950/50'">
+              <div class="space-y-3">
+                <div class="flex items-center gap-2">
+                  <span class="text-[9px] font-bold px-2 py-0.5 rounded bg-red-500/10 border border-red-500/30 text-red-500 uppercase font-sans">SEQUENCER SAFETY</span>
+                  <span class="text-xs font-bold" :class="activeTheme === 'light' ? 'text-slate-900' : 'text-white'">6. Sequencer Off Safety</span>
+                </div>
+                <div class="rounded-lg overflow-hidden border bg-slate-950 min-h-[160px] flex items-center justify-center cursor-pointer"
+                     :class="activeTheme === 'light' ? 'border-slate-200' : 'border-slate-800'"
+                     @click="modalImageUrl = './assets/Sequencer closeup.jpg'; modalImageTitle = 'Sequencer Button Closeup'; modalImageDesc = 'A closeup view of the physical SEQUENCER button. Ensure Sequencer is turned OFF so automated step macros do not override your live switches.'; showImageModal = true">
+                  <img src="./assets/Sequencer closeup.jpg" class="w-full max-h-44 object-contain rounded-lg hover:scale-[1.02] transition duration-200" />
+                </div>
+                <p class="text-xs font-serif leading-relaxed" :class="activeTheme === 'light' ? 'text-slate-600' : 'text-slate-400'">
+                  Ensure the hardware Sequencer is disabled before taking live inputs:
+                </p>
+                <ul class="list-disc list-inside text-[11px] font-serif pl-1 space-y-1.5" :class="activeTheme === 'light' ? 'text-slate-650' : 'text-slate-400'">
+                  <li><strong>[SEQUENCER] Button Status</strong>: Verify this button is <strong>OFF</strong> (unlit). If active, auto-sequences will trigger unexpectedly and override your manual video switching.</li>
+                </ul>
+              </div>
+            </div>
+
           </div>
         </div>
 
@@ -309,7 +331,7 @@
             <h2 class="text-lg font-black font-sans flex items-center gap-2" :class="activeTheme === 'light' ? 'text-slate-900' : 'text-white'">
               <i data-lucide="power" class="animate-pulse" :class="activeTheme === 'light' ? 'text-blue-600' : 'text-[#10b981]'"></i> 1. Clear Settings & Reset Switcher
             </h2>
-            <p class="text-sm font-serif leading-relaxed" :class="activeTheme === 'cyber' ? 'text-[#94a3b8]' : (activeTheme === 'amber' ? 'text-[#b0aea5]' : 'text-slate-400')">
+            <p class="text-sm font-serif leading-relaxed" :class="activeTheme === 'light' ? 'text-slate-650' : 'text-slate-400'">
               Before plugging in any laptops, let's wipe all leftover setups so we start fresh. Turn on the Roland V-160HD hardware switcher, press the menu knob, and execute a Factory Reset.
             </p>
           </div>
@@ -333,6 +355,18 @@
                 <img src="./assets/1. Roland Menu Exit Enter Knob Closeup.jpg" loading="eager" decoding="async" class="w-full max-h-48 object-contain rounded-lg" />
               </div>
             </div>
+          </div>
+
+          <!-- Why Resetting is Essential (Matrix Routing Explanation) -->
+          <div class="p-4 rounded-xl border space-y-2 font-sans"
+               :class="activeTheme === 'light' ? 'bg-blue-50/70 border-blue-200 text-blue-950' : 'bg-slate-950/90 border-blue-900/40 text-slate-300'">
+            <div class="flex items-center gap-2">
+              <i data-lucide="info" class="w-4 h-4 text-blue-600 shrink-0"></i>
+              <h3 class="text-xs font-bold font-sans uppercase tracking-wider text-blue-700 dark:text-blue-400">Why Resetting is Essential (No Image Fix)</h3>
+            </div>
+            <p class="text-xs leading-relaxed font-serif" :class="activeTheme === 'light' ? 'text-slate-700' : 'text-slate-300'">
+              Matrix routing may not be set correctly, and outputs could have been changed by a previous operator. Because both inputs and outputs are completely customizable, routing assignments can easily become scrambled—meaning <strong>Input 1 can end up as Input 5</strong>, and outputs can be completely reassigned. This is often the root cause when you experience <strong>no image</strong>. Performing a factory reset is the most effective way to restore standard default paths in Section 1 (Clear Settings & Reset Switcher). <strong>Please ask the V1 at the very least before executing reset if you are unsure.</strong>
+            </p>
           </div>
         </div>
 
@@ -1134,7 +1168,7 @@
         expertMode: false,
 
         // Active Theme state ('dark' / 'light')
-        activeTheme: 'dark',
+        activeTheme: 'light',
 
         // Active visual tab (only applicable when expertMode is active)
         activeTab: 'checklist',
@@ -1216,10 +1250,10 @@
               {
                 label: "Execute Factory Reset Baseline",
                 menu: "[MENU] -> SYSTEM -> FACTORY RESET",
-                desc: "Wipe all host venue configuration residuals, network IP locks, or corrupt EDID setups.",
+                desc: "Why reset? Matrix routing may not be set correctly and outputs could have been changed. Because both inputs and outputs are completely customizable, routing assignments easily become scrambled (e.g., Input 1 can end up as Input 5, and outputs completely reassigned)—making a factory reset the most effective way to restore standard default paths. Please ask the V1 at the very least before executing reset if you are unsure.",
                 completed: false,
                 image: './assets/1. Roland Menu Exit Enter Knob Closeup.jpg',
-                imageDesc: 'Navigate to [SYSTEM] using the physical menu knob. Select [FACTORY RESET] at the bottom of the list. Choose [YES] in the confirmation dialog that pops up next.'
+                imageDesc: 'Navigate to [SYSTEM] using the physical menu knob. Select [FACTORY RESET] at the bottom of the list. Choose [YES] to restore default input/output matrix routing.'
               },
               {
                 label: "Wipe Out Preset Memories",
@@ -1446,7 +1480,13 @@
         // Preload step images in memory so wizard navigation is instant with 0ms delay
         preloadAssets() {
           const assetUrls = [
+            './assets/Switcher overview closeup.jpg',
+            './assets/In Out closeup.jpg',
             './assets/1. Roland Menu Exit Enter Knob Closeup.jpg',
+            './assets/Menu closeup.jpg',
+            './assets/Output fade safety closeup.jpg',
+            './assets/Sequencer closeup.jpg',
+            './assets/Freeze closeup.jpg',
             './assets/2. Roland Outs Ins Closeup HDMI OUT 3 for Preview Monitor .JPG',
             './assets/3. Roland Outs Ins Closeup HDMI 1.JPG',
             './assets/Laptop with HDMI.jpg',
@@ -1485,9 +1525,10 @@
           const savedTheme = localStorage.getItem('v160_companion_theme');
           const savedAudioOpt = localStorage.getItem('v160_companion_audio_opt');
 
-          // Always reset Wizard/Checklist state on new loads
+          // Always reset Wizard/Checklist state & start in light mode on new loads
           this.expertMode = false;
           this.wizardStep = 0;
+          this.activeTheme = 'light';
           this.phases.forEach(phase => {
             phase.steps.forEach(step => step.completed = false);
           });
@@ -1505,9 +1546,9 @@
             }
           }
           if (savedFaders) this.faders = JSON.parse(savedFaders);
-          if (savedTheme) {
-            this.activeTheme = ['cyber', 'green', 'dark'].includes(savedTheme) ? 'dark' : (savedTheme === 'amber' ? 'light' : savedTheme);
-          }
+          // Always default to light mode on open and clear any theme overrides
+          localStorage.removeItem('v160_companion_theme');
+          this.activeTheme = 'light';
           if (savedAudioOpt) this.audioOption = savedAudioOpt;
           if (savedTally) {
             const data = JSON.parse(savedTally);
